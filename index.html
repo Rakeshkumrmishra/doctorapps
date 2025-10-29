@@ -513,28 +513,7 @@
         <input type="text" id="username" placeholder="Enter your name" value="Alex Johnson" readonly>
         <button onclick="login()">Start Chatting</button>
         
-        <div class="firebase-info">
-            <h3>Firebase Setup Instructions</h3>
-            <p><strong>If you're getting errors, follow these steps:</strong></p>
-            <ol style="margin-left: 20px; margin-top: 10px;">
-                <li>Go to <a href="https://console.firebase.google.com/" target="_blank">Firebase Console</a></li>
-                <li>Create a new project or use existing one</li>
-                <li>Enable Firestore Database</li>
-                <li>Go to Project Settings > General</li>
-                <li>Copy your Firebase config and replace the config in the code</li>
-                <li>In Firestore > Rules, set to:
-                    <pre style="background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 4px;">
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
-    }
-  }
-}</pre>
-                </li>
-            </ol>
-        </div>
+     
     </div>
     
     <!-- Chat Interface -->
@@ -939,3 +918,4 @@ service cloud.firestore {
     </script>
 </body>
 </html>
+
