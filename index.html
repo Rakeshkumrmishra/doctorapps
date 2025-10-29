@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Real-Time Chat</title>
+    <title>Secure Code-Based Chat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -274,16 +274,6 @@
             color: #333;
         }
         
-        .login-container input {
-            width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            outline: none;
-            font-size: 14px;
-        }
-        
         .login-container button {
             width: 100%;
             padding: 12px;
@@ -294,52 +284,53 @@
             cursor: pointer;
             font-weight: 600;
             transition: background-color 0.2s;
+            margin-top: 20px;
         }
         
         .login-container button:hover {
             background-color: #5a7dfa;
         }
         
-        .user-selector {
+        .user-codes {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .user-option {
-            flex: 1;
-            min-width: 120px;
-            padding: 15px 10px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .user-option:hover {
-            background-color: #f5f7fb;
-        }
-        
-        .user-option.selected {
-            background-color: #6e8efb;
-            color: white;
-            border-color: #6e8efb;
-        }
-        
-        .firebase-info {
+            flex-direction: column;
+            gap: 15px;
             margin-top: 20px;
+        }
+        
+        .user-code-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 15px;
-            background-color: #f9f9f9;
+            background-color: #f5f7fb;
             border-radius: 8px;
-            font-size: 14px;
-            color: #666;
+            border-left: 4px solid #6e8efb;
+        }
+        
+        .user-code-info {
             text-align: left;
         }
         
-        .firebase-info h3 {
-            margin-bottom: 10px;
+        .user-code-info h4 {
+            font-size: 16px;
             color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .user-code-info p {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .user-code {
+            font-size: 18px;
+            font-weight: bold;
+            color: #6e8efb;
+            background-color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px dashed #6e8efb;
         }
         
         .status-indicator {
@@ -451,6 +442,10 @@
             .chat-input button {
                 padding: 10px 15px;
             }
+            
+            .login-container {
+                margin: 20px;
+            }
         }
         
         @media (max-width: 480px) {
@@ -464,15 +459,16 @@
             
             .login-container {
                 padding: 20px;
-                margin: 20px;
             }
             
-            .user-selector {
+            .user-code-item {
                 flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
             }
             
-            .user-option {
-                min-width: auto;
+            .user-code {
+                align-self: flex-end;
             }
             
             .message {
@@ -537,31 +533,38 @@
 
     <!-- Login Screen -->
     <div id="loginScreen" class="login-container">
-        <h2>Secure Real-Time Chat</h2>
-        <p style="margin-bottom: 20px; color: #666;">Select your user to start chatting</p>
+        <h2>Secure Code-Based Chat</h2>
+        <p style="margin-bottom: 20px; color: #666;">Enter your unique code to access the chat</p>
         
-        <div class="user-selector">
-            <div class="user-option" onclick="selectUser('user1')">
-                <i class="fas fa-user" style="font-size: 24px; margin-bottom: 5px;"></i>
-                <div>Alex Johnson</div>
+        <button onclick="showCodePopup()">
+            <i class="fas fa-key"></i> Enter Access Code
+        </button>
+        
+        <div class="user-codes">
+            <h3 style="margin: 20px 0 10px; color: #333; text-align: left;">Available User Codes:</h3>
+            <div class="user-code-item">
+                <div class="user-code-info">
+                    <h4>Alex Johnson</h4>
+                    <p>Use this code to login as Alex</p>
+                </div>
+                <div class="user-code">ALEX123</div>
             </div>
-            <div class="user-option" onclick="selectUser('user2')">
-                <i class="fas fa-user" style="font-size: 24px; margin-bottom: 5px;"></i>
-                <div>Sam Wilson</div>
+            <div class="user-code-item">
+                <div class="user-code-info">
+                    <h4>Sam Wilson</h4>
+                    <p>Use this code to login as Sam</p>
+                </div>
+                <div class="user-code">SAM456</div>
             </div>
         </div>
         
-        <input type="text" id="username" placeholder="Enter your name" value="Alex Johnson" readonly>
-        <button onclick="showSecurityPopup()">Start Secure Chat</button>
-        
-        <div class="firebase-info">
-            <h3>Secure Chat Features</h3>
-            <ul style="margin-left: 20px; margin-top: 10px;">
-                <li>End-to-end encryption (simulated)</li>
-                <li>Secure authentication required</li>
-                <li>Privacy-focused design</li>
-                <li>No message storage on server</li>
-            </ul>
+        <div style="margin-top: 25px; padding: 15px; background-color: #f9f9f9; border-radius: 8px;">
+            <h4 style="color: #333; margin-bottom: 10px;">How to use:</h4>
+            <ol style="text-align: left; padding-left: 20px; color: #666;">
+                <li>Click "Enter Access Code" button</li>
+                <li>Enter one of the codes above</li>
+                <li>Chat will open automatically</li>
+            </ol>
         </div>
     </div>
     
@@ -604,8 +607,8 @@
                 <div class="message received">
                     <img src="https://i.pravatar.cc/150?img=12" alt="Alex" class="message-avatar">
                     <div class="message-content">
-                        <p>Welcome to the secure chat! All messages are encrypted for your privacy.</p>
-                        <div class="message-time" id="welcome-time">Just now</div>
+                        <p>Welcome to the secure chat! Enter your code to start messaging.</p>
+                        <div class="message-time" id="welcome-time">System</div>
                     </div>
                 </div>
             </div>
@@ -615,7 +618,7 @@
             </div>
             
             <div class="chat-input">
-                <input type="text" id="messageInput" placeholder="Type a secure message...">
+                <input type="text" id="messageInput" placeholder="Type a message...">
                 <button id="sendButton">
                     <i class="fas fa-paper-plane"></i> <span>Send</span>
                 </button>
@@ -638,6 +641,20 @@
             messagingSenderId: "502335602197",
             appId: "1:502335602197:web:7eea29a2b2402d98e1d81c",
             measurementId: "G-DD9RHLS83Z"
+        };
+        
+        // User codes and details
+        const userCodes = {
+            "ALEX123": {
+                name: "Alex Johnson",
+                avatar: "https://i.pravatar.cc/150?img=5",
+                id: "user1"
+            },
+            "SAM456": {
+                name: "Sam Wilson", 
+                avatar: "https://i.pravatar.cc/150?img=12",
+                id: "user2"
+            }
         };
         
         // App State
@@ -663,40 +680,99 @@
         const connectionStatus = document.getElementById('connectionStatus');
         const backHomeBtn = document.getElementById('backHomeBtn');
         
-        // Show security popup
-        function showSecurityPopup() {
+        // Show code input popup
+        function showCodePopup() {
             Swal.fire({
-                title: 'Security Verification',
-                html: `
-                    <div style="text-align: left;">
-                        <p>This chat application uses:</p>
-                        <ul>
-                            <li>End-to-end encryption</li>
-                            <li>Secure authentication</li>
-                            <li>Privacy protection</li>
-                        </ul>
-                        <p>By continuing, you agree to our privacy policy.</p>
-                    </div>
-                `,
-                icon: 'info',
+                title: 'Enter Access Code',
+                input: 'text',
+                inputPlaceholder: 'Enter your code here...',
+                inputAttributes: {
+                    autocapitalize: 'off',
+                    autocorrect: 'off',
+                    maxlength: 10
+                },
                 showCancelButton: true,
-                confirmButtonText: 'I Agree & Continue',
+                confirmButtonText: 'Access Chat',
                 cancelButtonText: 'Cancel',
                 confirmButtonColor: '#6e8efb',
                 backdrop: true,
                 allowOutsideClick: false,
-                preConfirm: () => {
-                    return new Promise((resolve) => {
-                        // Simulate security check
-                        setTimeout(() => {
-                            resolve();
-                        }, 1000);
-                    });
+                preConfirm: (code) => {
+                    if (!code) {
+                        Swal.showValidationMessage('Please enter a code');
+                        return false;
+                    }
+                    
+                    const userCode = code.toUpperCase().trim();
+                    if (!userCodes[userCode]) {
+                        Swal.showValidationMessage('Invalid code. Please try again.');
+                        return false;
+                    }
+                    
+                    return userCode;
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    login();
+                    const userCode = result.value;
+                    loginWithCode(userCode);
                 }
+            });
+        }
+        
+        // Login with code
+        function loginWithCode(code) {
+            const userData = userCodes[code];
+            
+            if (!userData) {
+                Swal.fire({
+                    title: 'Invalid Code',
+                    text: 'The code you entered is not valid. Please try again.',
+                    icon: 'error',
+                    confirmButtonText: 'Try Again',
+                    confirmButtonColor: '#6e8efb'
+                }).then(() => {
+                    showCodePopup();
+                });
+                return;
+            }
+            
+            currentUser = userData.name;
+            currentUserId = userData.id;
+            
+            // Set user info in UI
+            currentUserName.textContent = currentUser;
+            const otherUser = currentUser === "Alex Johnson" ? "Sam Wilson" : "Alex Johnson";
+            contactName.textContent = otherUser;
+            chatContactName.textContent = otherUser;
+            
+            // Set avatars
+            currentUserAvatar.src = userData.avatar;
+            
+            // Show chat interface
+            loginScreen.style.display = 'none';
+            chatScreen.style.display = 'flex';
+            backHomeBtn.style.display = 'block';
+            
+            // Initialize Firebase if not already done
+            if (!firebaseInitialized) {
+                initializeFirebase();
+            }
+            
+            // Load messages
+            loadMessages();
+            
+            // Set up real-time listener for new messages
+            setupMessageListener();
+            
+            // Show success message
+            Swal.fire({
+                title: 'Access Granted!',
+                text: `Welcome ${currentUser}!`,
+                icon: 'success',
+                confirmButtonText: 'Start Chatting',
+                confirmButtonColor: '#6e8efb',
+                timer: 2000,
+                showConfirmButton: false
             });
         }
         
@@ -728,9 +804,9 @@
             loginScreen.style.display = 'block';
             backHomeBtn.style.display = 'none';
             
-            // Reset form
-            document.getElementById('username').value = 'Alex Johnson';
-            selectUser('user1');
+            // Reset state
+            currentUser = '';
+            currentUserId = '';
         }
         
         // Initialize Firebase with error handling
@@ -793,59 +869,6 @@
                 confirmButtonText: 'OK',
                 confirmButtonColor: '#6e8efb'
             });
-        }
-        
-        // User Selection
-        function selectUser(user) {
-            const userOptions = document.querySelectorAll('.user-option');
-            userOptions.forEach(option => option.classList.remove('selected'));
-            
-            event.currentTarget.classList.add('selected');
-            
-            if (user === 'user1') {
-                document.getElementById('username').value = 'Alex Johnson';
-                currentUserId = 'user1';
-            } else {
-                document.getElementById('username').value = 'Sam Wilson';
-                currentUserId = 'user2';
-            }
-        }
-        
-        // Login Function
-        function login() {
-            currentUser = document.getElementById('username').value;
-            
-            if (!currentUser) {
-                alert('Please enter your name');
-                return;
-            }
-            
-            // Set user info in UI
-            currentUserName.textContent = currentUser;
-            const otherUser = currentUser === 'Alex Johnson' ? 'Sam Wilson' : 'Alex Johnson';
-            contactName.textContent = otherUser;
-            chatContactName.textContent = otherUser;
-            
-            // Set avatars
-            currentUserAvatar.src = currentUser === 'Alex Johnson' 
-                ? 'https://i.pravatar.cc/150?img=5' 
-                : 'https://i.pravatar.cc/150?img=12';
-            
-            // Show chat interface
-            loginScreen.style.display = 'none';
-            chatScreen.style.display = 'flex';
-            backHomeBtn.style.display = 'block';
-            
-            // Initialize Firebase if not already done
-            if (!firebaseInitialized) {
-                initializeFirebase();
-            }
-            
-            // Load messages
-            loadMessages();
-            
-            // Set up real-time listener for new messages
-            setupMessageListener();
         }
         
         // Load messages from Firestore
@@ -1023,9 +1046,14 @@
             }
         });
         
-        // Initialize by selecting first user and initializing Firebase
-        selectUser('user1');
+        // Initialize Firebase
         initializeFirebase();
+        
+        // Auto-show code popup after a short delay
+        setTimeout(() => {
+            // Uncomment the line below if you want the code popup to appear automatically
+            // showCodePopup();
+        }, 500);
     </script>
 </body>
 </html>
