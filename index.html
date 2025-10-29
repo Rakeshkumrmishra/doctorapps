@@ -1,1006 +1,941 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <title>Tailwind Navbar with Sidebar</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-
-  <style>
-    #overlay {
-      background-color: rgba(0, 0, 0, 0.5);
-    }
-  </style>
-  <style>
-    body {
-      /*background-color: #f4f7fb;
-      soft bluish-white */
-      color: rgb(14, 13, 13);
-    }
-
-    .material-symbols-outlined.fill {
-    font-variation-settings:
-      'FILL' 1,
-      'wght' 400,
-      'GRAD' 0,
-      'opsz' 48;
-  }
-
-    .cut-out::before {
-      content: "";
-      position: absolute;
-      left: 0px;
-      top: 4px;
-      width: 0;
-      height: 0;
-      border-top: 13px solid transparent;
-      border-bottom: 13px solid transparent;
-      border-left: 13px solid rgb(255, 255, 255);
-      /* background color of the parent element or page */
-      border-right: 13px solid transparent;
-      z-index: 2;
-    }
-
-    .navbar {
-      padding-right: calc(var(--bs-gutter-x) * .5);
-      padding-left: calc(var(--bs-gutter-x) * .5);
-      margin-right: auto;
-      margin-left: auto;
-    }
-
-    .body {
-      background-image:
-        linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(255, 255, 255, 1) 85%),
-        radial-gradient(ellipse at top left, rgba(13, 110, 253, 0.5), transparent 50%),
-        radial-gradient(ellipse at top right, rgba(214, 51, 132, 0.5), transparent 50%),
-        radial-gradient(ellipse at center right, rgba(111, 66, 193, 0.5), transparent 50%),
-        radial-gradient(ellipse at center left, rgba(255, 102, 204, 0.5), transparent 50%);
-    }
- 
-    .clinicaddress::before {
-  content: "location_on"; /* Use ligature name, not unicode */
-  font-family: "Material Icons";
-  font-style: normal;
-  font-weight: normal;
-  font-size: 18px;
-  line-height: 1;
-  display: inline-block;
-  position: absolute;
-  left: 12px;
-  
-  color:gray; /* Red */
-}
-  .distance::before{
-    
-    content: "near_me"; /* Use ligature name, not unicode */
-  font-family: "Material Icons";
-  font-style: normal;
-  font-weight: normal;
-  font-size: 18px;
-  line-height: 1;
-  display: inline-block;
-  position: absolute;
-  left: 12px;
-  color:blue;
-  }
-  .material-symbols-outlined.fill {
-  font-variation-settings: 'FILL' 1;
-}
-
-  </style>
-</head>
-
-<body class="h-screen overflow-hidden">
-
-  <!-- ✅ Overlay -->
-  <div id="overlay" class="fixed inset-0 z-30 hidden md:hidden"></div>
-
-  <!-- ✅ Top Navbar (Fixed) -->
-  <nav class="fixed top-0 left-0 right-0 z-30 md:bg-gray-800 bg-white h-16 flex items-center px-4">
-    <div class="flex-1 flex items-center justify-between">
-      <!-- Logo + Brand Name -->
-      <div class="flex items-center space-x-2">
-        <img class="h-8 w-auto" src="https://tailwindcss.com/plus-assets/img/logos/mark.svg?color=indigo&shade=500"
-          alt="MediWay Logo">
-        <span class="text-xl font-semibold text-gray-800 md:text-white">MediReach</span>
-      </div>
-
-      <!-- Desktop Nav Links -->
-      <div class="hidden sm:ml-6 sm:flex space-x-4">
-        <a href="#" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white">Dashboard</a>
-        <a href="#"
-          class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Team</a>
-        <a href="#"
-          class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Projects</a>
-        <a href="#"
-          class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Calendar</a>
-      </div>
-
-      <!-- Mobile Menu: Search + Hamburger -->
-      <div class="flex items-center sm:hidden gap-3">
-        <!-- Search Icon -->
-        <button type="button"
-          class="p-2 text-gray-400 rounded-full hover:bg-gray-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-white">
-          <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-            <path stroke-linecap="round" stroke-linejoin="round"
-              d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z" />
-          </svg>
-        </button>
-
-        <!-- Hamburger Menu -->
-        <button id="menu-toggle" type="button"
-          class="p-2 text-gray-400 hover:bg-gray-200 hover:text-white rounded-full focus:outline-none focus:ring-2 focus:ring-white">
-          <svg id="icon-open" class="block size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-            stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-          </svg>
-          <svg id="icon-close" class="hidden size-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-            stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-    </div>
-  </nav>
-
-
-  <!-- ✅ Sidebar (Fixed) -->
-  <aside id="sidebar"
-    class="fixed md:top-16 bottom-0 right-0 z-50 w-64 md:bg-gray-900 bg-white md:text-white text-gray-700 h-[calc(100vh-4rem)] p-4 transform translate-x-full transition-transform duration-300 ease-in-out md:translate-x-0 md:right-auto md:left-0">
-    <div class="text-xl font-bold border-b border-gray-700 pb-4">Sidebar</div>
-    <nav class="space-y-2 mt-4">
-      <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700">Dashboard</a>
-      <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700">Team</a>
-      <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700">Projects</a>
-      <a href="#" class="block px-4 py-2 rounded hover:bg-gray-700">Calendar</a>
-    </nav>
-  </aside>
-
-  <!-- ✅ Page Content -->
-  <main class="pt-[80px] md:pl-64 h-[calc(100vh-4rem)] overflow-auto bg-gray-100  ">
-
-    <div class="max-w-6xl mx-auto p-0">
-
-
-      <div class="flex mb-4 md:rounded-2xl md:shadow p-3 items-center justify-between bg-white w-full">
-        <div class="flex flex-wrap gap-1 justify-center" id="category-container"></div>
-      </div>
-
-
-
-      <!-- Doctor Cards -->
-      <div class="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 ">
-        <div
-         class="bg-white md:rounded-2xl md:shadow text-center space-y-4 relative border  md:border-gray-300 ">
-          <div class="flex justify-center align-center p-3 border-1">
-            <div><img
-                src="https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg?t=st=1744740981~exp=1744744581~hmac=79e7c7f72f23586238daa13e9c4513aa1bdcb380dc88ff2a28cbd4252ea13e10&w=996"
-                class="w-[110px] h-[110px] rounded-full shadow p-1 object-cover" /></div>
-            <div class="flex-1 text-left p-3">
-              <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-[3px]"
-                  style="font-size: 15px;">Dermatologist</span>
-              <div class="text-lg font-semibold">Dr. Rakesh Kumar Mishra</div>
-              <div class="text-sm text-gray-500">MBBS, MD-Dermatology</div>
-            </div>
-          </div>
-          <hr class="mb-2 border-t border-gray-200" />
-          <div class="flex justify-between px-4">
-          <div class="text-left  ml-7">
-            <div class="text-sm text-gray font-bold clinicaddress">Basudha clinic</div>
-            <div class="text-sm text-gray-500 ">Barapali Pada, Bolangir</div>
-            <div class="text-sm text-gray-500 font-bold distance">Approx. 1.25 km</div>
-          </div>
-          <div class="pr-5">
-            <div class="text-sm text-gray-500 ">Fees</div>
-            <div class=" flex"> <span class="material-symbols-outlined text-sm text-gray font-bold">
-              currency_rupee
-              </span><div class="text-sm text-gray font-bold">800</div></div>
-          </div>
-        </div>
-        <div class="absolute top-[-10px] right-[12px] px-2 pl-4 py-2 cut-out">
-          <span class="material-symbols-outlined text-gray-300 text-3xl cursor-pointer transition-all duration-300 favorite-icon">
-            favorite
-          </span>
-        </div>
-          <!-- Doctor Card footer-->
-          <div class="flex justify-around align-center pb-4">
-            <div class="text-left">
-              <div class="text-sm text-gray font-bold ">Next Avaliable at</div>
-              <div class="text-sm text-gray-500  ">10:30 AM - 21 April, Mon</div>
-            </div>
-            <div>
-              <div class="flex justify-center">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 flex items-center">
-                  <span class="material-symbols-outlined mr-[2px]">
-                    outpatient_med
-                  </span>
-                  Book A Visit
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-         class="bg-white md:rounded-2xl md:shadow text-center space-y-4 relative border  md:border-gray-300 ">
-          <div class="flex justify-center align-center p-3 border-1">
-            <div><img
-                src="https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg?t=st=1744740981~exp=1744744581~hmac=79e7c7f72f23586238daa13e9c4513aa1bdcb380dc88ff2a28cbd4252ea13e10&w=996"
-                class="w-[110px] h-[110px] rounded-full shadow p-1 object-cover" /></div>
-            <div class="flex-1 text-left p-3">
-              <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-[3px]"
-                  style="font-size: 15px;">Dermatologist</span>
-              <div class="text-lg font-semibold">Dr. Rakesh Kumar Mishra</div>
-              <div class="text-sm text-gray-500">MBBS, MD-Dermatology</div>
-            </div>
-          </div>
-          <hr class="mb-2 border-t border-gray-200" />
-          <div class="flex justify-between px-4">
-          <div class="text-left  ml-7">
-            <div class="text-sm text-gray font-bold clinicaddress">Basudha clinic</div>
-            <div class="text-sm text-gray-500 ">Barapali Pada, Bolangir</div>
-            <div class="text-sm text-gray-500 font-bold distance">Approx. 1.25 km</div>
-          </div>
-          <div class="pr-5">
-            <div class="text-sm text-gray-500 ">Fees</div>
-            <div class=" flex"> <span class="material-symbols-outlined text-sm text-gray font-bold">
-              currency_rupee
-              </span><div class="text-sm text-gray font-bold">800</div></div>
-          </div>
-        </div>
-        <div class="absolute top-[-10px] right-[12px] px-2 pl-4 py-2 cut-out">
-          <span class="material-symbols-outlined text-gray-300 text-3xl cursor-pointer transition-all duration-300 favorite-icon">
-            favorite
-          </span>
-        </div>
-          <!-- Doctor Card footer-->
-          <div class="flex justify-around align-center pb-4">
-            <div class="text-left">
-              <div class="text-sm text-gray font-bold ">Next Avaliable at</div>
-              <div class="text-sm text-gray-500  ">10:30 AM - 21 April, Mon</div>
-            </div>
-            <div>
-              <div class="flex justify-center">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 flex items-center">
-                  <span class="material-symbols-outlined mr-[2px]">
-                    outpatient_med
-                  </span>
-                  Book A Visit
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div
-         class="bg-white md:rounded-2xl md:shadow text-center space-y-4 relative border  md:border-gray-300 ">
-          <div class="flex justify-center align-center p-3 border-1">
-            <div><img
-                src="https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg?t=st=1744740981~exp=1744744581~hmac=79e7c7f72f23586238daa13e9c4513aa1bdcb380dc88ff2a28cbd4252ea13e10&w=996"
-                class="w-[110px] h-[110px] rounded-full shadow p-1 object-cover" /></div>
-            <div class="flex-1 text-left p-3">
-              <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-[3px]"
-                  style="font-size: 15px;">Dermatologist</span>
-              <div class="text-lg font-semibold">Dr. Rakesh Kumar Mishra</div>
-              <div class="text-sm text-gray-500">MBBS, MD-Dermatology</div>
-            </div>
-          </div>
-          <hr class="mb-2 border-t border-gray-200" />
-          <div class="flex justify-between px-4">
-          <div class="text-left  ml-7">
-            <div class="text-sm text-gray font-bold clinicaddress">Basudha clinic</div>
-            <div class="text-sm text-gray-500 ">Barapali Pada, Bolangir</div>
-            <div class="text-sm text-gray-500 font-bold distance">Approx. 1.25 km</div>
-          </div>
-          <div class="pr-5">
-            <div class="text-sm text-gray-500 ">Fees</div>
-            <div class=" flex"> <span class="material-symbols-outlined text-sm text-gray font-bold">
-              currency_rupee
-              </span><div class="text-sm text-gray font-bold">800</div></div>
-          </div>
-        </div>
-        <div class="absolute top-[-10px] right-[12px] px-2 pl-4 py-2 cut-out">
-          <span class="material-symbols-outlined text-gray-300 text-3xl cursor-pointer transition-all duration-300 favorite-icon">
-            favorite
-          </span>
-        </div>
-          <!-- Doctor Card footer-->
-          <div class="flex justify-around align-center pb-4">
-            <div class="text-left">
-              <div class="text-sm text-gray font-bold ">Next Avaliable at</div>
-              <div class="text-sm text-gray-500  ">10:30 AM - 21 April, Mon</div>
-            </div>
-            <div>
-              <div class="flex justify-center">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 flex items-center">
-                  <span class="material-symbols-outlined mr-[2px]">
-                    outpatient_med
-                  </span>
-                  Book A Visit
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-         class="bg-white md:rounded-2xl md:shadow text-center space-y-4 relative border  md:border-gray-300 ">
-          <div class="flex justify-center align-center p-3 border-1">
-            <div><img
-                src="https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg?t=st=1744740981~exp=1744744581~hmac=79e7c7f72f23586238daa13e9c4513aa1bdcb380dc88ff2a28cbd4252ea13e10&w=996"
-                class="w-[110px] h-[110px] rounded-full shadow p-1 object-cover" /></div>
-            <div class="flex-1 text-left p-3">
-              <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-[3px]"
-                  style="font-size: 15px;">Dermatologist</span>
-              <div class="text-lg font-semibold">Dr. Rakesh Kumar Mishra</div>
-              <div class="text-sm text-gray-500">MBBS, MD-Dermatology</div>
-            </div>
-          </div>
-          <hr class="mb-2 border-t border-gray-200" />
-          <div class="flex justify-between px-4">
-          <div class="text-left  ml-7">
-            <div class="text-sm text-gray font-bold clinicaddress">Basudha clinic</div>
-            <div class="text-sm text-gray-500 ">Barapali Pada, Bolangir</div>
-            <div class="text-sm text-gray-500 font-bold distance">Approx. 1.25 km</div>
-          </div>
-          <div class="pr-5">
-            <div class="text-sm text-gray-500 ">Fees</div>
-            <div class=" flex"> <span class="material-symbols-outlined text-sm text-gray font-bold">
-              currency_rupee
-              </span><div class="text-sm text-gray font-bold">800</div></div>
-          </div>
-        </div>
-        <div class="absolute top-[-10px] right-[12px] px-2 pl-4 py-2 cut-out">
-          <span class="material-symbols-outlined text-gray-300 text-3xl cursor-pointer transition-all duration-300 favorite-icon">
-            favorite
-          </span>
-        </div>
-          <!-- Doctor Card footer-->
-          <div class="flex justify-around align-center pb-4">
-            <div class="text-left">
-              <div class="text-sm text-gray font-bold ">Next Avaliable at</div>
-              <div class="text-sm text-gray-500  ">10:30 AM - 21 April, Mon</div>
-            </div>
-            <div>
-              <div class="flex justify-center">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 flex items-center">
-                  <span class="material-symbols-outlined mr-[2px]">
-                    outpatient_med
-                  </span>
-                  Book A Visit
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-         class="bg-white md:rounded-2xl md:shadow text-center space-y-4 relative border  md:border-gray-300 ">
-          <div class="flex justify-center align-center p-3 border-1">
-            <div><img
-                src="https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg?t=st=1744740981~exp=1744744581~hmac=79e7c7f72f23586238daa13e9c4513aa1bdcb380dc88ff2a28cbd4252ea13e10&w=996"
-                class="w-[110px] h-[110px] rounded-full shadow p-1 object-cover" /></div>
-            <div class="flex-1 text-left p-3">
-              <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-[3px]"
-                  style="font-size: 15px;">Dermatologist</span>
-              <div class="text-lg font-semibold">Dr. Rakesh Kumar Mishra</div>
-              <div class="text-sm text-gray-500">MBBS, MD-Dermatology</div>
-            </div>
-          </div>
-          <hr class="mb-2 border-t border-gray-200" />
-          <div class="flex justify-between px-4">
-          <div class="text-left  ml-7">
-            <div class="text-sm text-gray font-bold clinicaddress">Basudha clinic</div>
-            <div class="text-sm text-gray-500 ">Barapali Pada, Bolangir</div>
-            <div class="text-sm text-gray-500 font-bold distance">Approx. 1.25 km</div>
-          </div>
-          <div class="pr-5">
-            <div class="text-sm text-gray-500 ">Fees</div>
-            <div class=" flex"> <span class="material-symbols-outlined text-sm text-gray font-bold">
-              currency_rupee
-              </span><div class="text-sm text-gray font-bold">800</div></div>
-          </div>
-        </div>
-        <div class="absolute top-[-10px] right-[12px] px-2 pl-4 py-2 cut-out">
-          <span class="material-symbols-outlined text-gray-300 text-3xl cursor-pointer transition-all duration-300 favorite-icon">
-            favorite
-          </span>
-        </div>
-          <!-- Doctor Card footer-->
-          <div class="flex justify-around align-center pb-4">
-            <div class="text-left">
-              <div class="text-sm text-gray font-bold ">Next Avaliable at</div>
-              <div class="text-sm text-gray-500  ">10:30 AM - 21 April, Mon</div>
-            </div>
-            <div>
-              <div class="flex justify-center">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 flex items-center">
-                  <span class="material-symbols-outlined mr-[2px]">
-                    outpatient_med
-                  </span>
-                  Book A Visit
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-         class="bg-white md:rounded-2xl md:shadow text-center space-y-4 relative border  md:border-gray-300 ">
-          <div class="flex justify-center align-center p-3 border-1">
-            <div><img
-                src="https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg?t=st=1744740981~exp=1744744581~hmac=79e7c7f72f23586238daa13e9c4513aa1bdcb380dc88ff2a28cbd4252ea13e10&w=996"
-                class="w-[110px] h-[110px] rounded-full shadow p-1 object-cover" /></div>
-            <div class="flex-1 text-left p-3">
-              <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-[3px]"
-                  style="font-size: 15px;">Dermatologist</span>
-              <div class="text-lg font-semibold">Dr. Rakesh Kumar Mishra</div>
-              <div class="text-sm text-gray-500">MBBS, MD-Dermatology</div>
-            </div>
-          </div>
-          <hr class="mb-2 border-t border-gray-200" />
-          <div class="flex justify-between px-4">
-          <div class="text-left  ml-7">
-            <div class="text-sm text-gray font-bold clinicaddress">Basudha clinic</div>
-            <div class="text-sm text-gray-500 ">Barapali Pada, Bolangir</div>
-            <div class="text-sm text-gray-500 font-bold distance">Approx. 1.25 km</div>
-          </div>
-          <div class="pr-5">
-            <div class="text-sm text-gray-500 ">Fees</div>
-            <div class=" flex"> <span class="material-symbols-outlined text-sm text-gray font-bold">
-              currency_rupee
-              </span><div class="text-sm text-gray font-bold">800</div></div>
-          </div>
-        </div>
-        <div class="absolute top-[-10px] right-[12px] px-2 pl-4 py-2 cut-out">
-          <span class="material-symbols-outlined text-gray-300 text-3xl cursor-pointer transition-all duration-300 favorite-icon">
-            favorite
-          </span>
-        </div>
-          <!-- Doctor Card footer-->
-          <div class="flex justify-around align-center pb-4">
-            <div class="text-left">
-              <div class="text-sm text-gray font-bold ">Next Avaliable at</div>
-              <div class="text-sm text-gray-500  ">10:30 AM - 21 April, Mon</div>
-            </div>
-            <div>
-              <div class="flex justify-center">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 flex items-center">
-                  <span class="material-symbols-outlined mr-[2px]">
-                    outpatient_med
-                  </span>
-                  Book A Visit
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-         class="bg-white md:rounded-2xl md:shadow text-center space-y-4 relative border  md:border-gray-300 ">
-          <div class="flex justify-center align-center p-3 border-1">
-            <div><img
-                src="https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg?t=st=1744740981~exp=1744744581~hmac=79e7c7f72f23586238daa13e9c4513aa1bdcb380dc88ff2a28cbd4252ea13e10&w=996"
-                class="w-[110px] h-[110px] rounded-full shadow p-1 object-cover" /></div>
-            <div class="flex-1 text-left p-3">
-              <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-[3px]"
-                  style="font-size: 15px;">Dermatologist</span>
-              <div class="text-lg font-semibold">Dr. Rakesh Kumar Mishra</div>
-              <div class="text-sm text-gray-500">MBBS, MD-Dermatology</div>
-            </div>
-          </div>
-          <hr class="mb-2 border-t border-gray-200" />
-          <div class="flex justify-between px-4">
-          <div class="text-left  ml-7">
-            <div class="text-sm text-gray font-bold clinicaddress">Basudha clinic</div>
-            <div class="text-sm text-gray-500 ">Barapali Pada, Bolangir</div>
-            <div class="text-sm text-gray-500 font-bold distance">Approx. 1.25 km</div>
-          </div>
-          <div class="pr-5">
-            <div class="text-sm text-gray-500 ">Fees</div>
-            <div class=" flex"> <span class="material-symbols-outlined text-sm text-gray font-bold">
-              currency_rupee
-              </span><div class="text-sm text-gray font-bold">800</div></div>
-          </div>
-        </div>
-        <div class="absolute top-[-10px] right-[12px] px-2 pl-4 py-2 cut-out">
-          <span class="material-symbols-outlined text-gray-300 text-3xl cursor-pointer transition-all duration-300 favorite-icon">
-            favorite
-          </span>
-        </div>
-          <!-- Doctor Card footer-->
-          <div class="flex justify-around align-center pb-4">
-            <div class="text-left">
-              <div class="text-sm text-gray font-bold ">Next Avaliable at</div>
-              <div class="text-sm text-gray-500  ">10:30 AM - 21 April, Mon</div>
-            </div>
-            <div>
-              <div class="flex justify-center">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 flex items-center">
-                  <span class="material-symbols-outlined mr-[2px]">
-                    outpatient_med
-                  </span>
-                  Book A Visit
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-         class="bg-white md:rounded-2xl md:shadow text-center space-y-4 relative border  md:border-gray-300 ">
-          <div class="flex justify-center align-center p-3 border-1">
-            <div><img
-                src="https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg?t=st=1744740981~exp=1744744581~hmac=79e7c7f72f23586238daa13e9c4513aa1bdcb380dc88ff2a28cbd4252ea13e10&w=996"
-                class="w-[110px] h-[110px] rounded-full shadow p-1 object-cover" /></div>
-            <div class="flex-1 text-left p-3">
-              <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-[3px]"
-                  style="font-size: 15px;">Dermatologist</span>
-              <div class="text-lg font-semibold">Dr. Rakesh Kumar Mishra</div>
-              <div class="text-sm text-gray-500">MBBS, MD-Dermatology</div>
-            </div>
-          </div>
-          <hr class="mb-2 border-t border-gray-200" />
-          <div class="flex justify-between px-4">
-          <div class="text-left  ml-7">
-            <div class="text-sm text-gray font-bold clinicaddress">Basudha clinic</div>
-            <div class="text-sm text-gray-500 ">Barapali Pada, Bolangir</div>
-            <div class="text-sm text-gray-500 font-bold distance">Approx. 1.25 km</div>
-          </div>
-          <div class="pr-5">
-            <div class="text-sm text-gray-500 ">Fees</div>
-            <div class=" flex"> <span class="material-symbols-outlined text-sm text-gray font-bold">
-              currency_rupee
-              </span><div class="text-sm text-gray font-bold">800</div></div>
-          </div>
-        </div>
-        <div class="absolute top-[-10px] right-[12px] px-2 pl-4 py-2 cut-out">
-          <span class="material-symbols-outlined text-gray-300 text-3xl cursor-pointer transition-all duration-300 favorite-icon">
-            favorite
-          </span>
-        </div>
-          <!-- Doctor Card footer-->
-          <div class="flex justify-around align-center pb-4">
-            <div class="text-left">
-              <div class="text-sm text-gray font-bold ">Next Avaliable at</div>
-              <div class="text-sm text-gray-500  ">10:30 AM - 21 April, Mon</div>
-            </div>
-            <div>
-              <div class="flex justify-center">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 flex items-center">
-                  <span class="material-symbols-outlined mr-[2px]">
-                    outpatient_med
-                  </span>
-                  Book A Visit
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-         class="bg-white md:rounded-2xl md:shadow text-center space-y-4 relative border  md:border-gray-300 ">
-          <div class="flex justify-center align-center p-3 border-1">
-            <div><img
-                src="https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg?t=st=1744740981~exp=1744744581~hmac=79e7c7f72f23586238daa13e9c4513aa1bdcb380dc88ff2a28cbd4252ea13e10&w=996"
-                class="w-[110px] h-[110px] rounded-full shadow p-1 object-cover" /></div>
-            <div class="flex-1 text-left p-3">
-              <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-[3px]"
-                  style="font-size: 15px;">Dermatologist</span>
-              <div class="text-lg font-semibold">Dr. Rakesh Kumar Mishra</div>
-              <div class="text-sm text-gray-500">MBBS, MD-Dermatology</div>
-            </div>
-          </div>
-          <hr class="mb-2 border-t border-gray-200" />
-          <div class="flex justify-between px-4">
-          <div class="text-left  ml-7">
-            <div class="text-sm text-gray font-bold clinicaddress">Basudha clinic</div>
-            <div class="text-sm text-gray-500 ">Barapali Pada, Bolangir</div>
-            <div class="text-sm text-gray-500 font-bold distance">Approx. 1.25 km</div>
-          </div>
-          <div class="pr-5">
-            <div class="text-sm text-gray-500 ">Fees</div>
-            <div class=" flex"> <span class="material-symbols-outlined text-sm text-gray font-bold">
-              currency_rupee
-              </span><div class="text-sm text-gray font-bold">800</div></div>
-          </div>
-        </div>
-        <div class="absolute top-[-10px] right-[12px] px-2 pl-4 py-2 cut-out">
-          <span class="material-symbols-outlined text-gray-300 text-3xl cursor-pointer transition-all duration-300 favorite-icon">
-            favorite
-          </span>
-        </div>
-          <!-- Doctor Card footer-->
-          <div class="flex justify-around align-center pb-4">
-            <div class="text-left">
-              <div class="text-sm text-gray font-bold ">Next Avaliable at</div>
-              <div class="text-sm text-gray-500  ">10:30 AM - 21 April, Mon</div>
-            </div>
-            <div>
-              <div class="flex justify-center">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 flex items-center">
-                  <span class="material-symbols-outlined mr-[2px]">
-                    outpatient_med
-                  </span>
-                  Book A Visit
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-         class="bg-white md:rounded-2xl md:shadow text-center space-y-4 relative border  md:border-gray-300 ">
-          <div class="flex justify-center align-center p-3 border-1">
-            <div><img
-                src="https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg?t=st=1744740981~exp=1744744581~hmac=79e7c7f72f23586238daa13e9c4513aa1bdcb380dc88ff2a28cbd4252ea13e10&w=996"
-                class="w-[110px] h-[110px] rounded-full shadow p-1 object-cover" /></div>
-            <div class="flex-1 text-left p-3">
-              <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-[3px]"
-                  style="font-size: 15px;">Dermatologist</span>
-              <div class="text-lg font-semibold">Dr. Rakesh Kumar Mishra</div>
-              <div class="text-sm text-gray-500">MBBS, MD-Dermatology</div>
-            </div>
-          </div>
-          <hr class="mb-2 border-t border-gray-200" />
-          <div class="flex justify-between px-4">
-          <div class="text-left  ml-7">
-            <div class="text-sm text-gray font-bold clinicaddress">Basudha clinic</div>
-            <div class="text-sm text-gray-500 ">Barapali Pada, Bolangir</div>
-            <div class="text-sm text-gray-500 font-bold distance">Approx. 1.25 km</div>
-          </div>
-          <div class="pr-5">
-            <div class="text-sm text-gray-500 ">Fees</div>
-            <div class=" flex"> <span class="material-symbols-outlined text-sm text-gray font-bold">
-              currency_rupee
-              </span><div class="text-sm text-gray font-bold">800</div></div>
-          </div>
-        </div>
-        <div class="absolute top-[-10px] right-[12px] px-2 pl-4 py-2 cut-out">
-          <span class="material-symbols-outlined text-gray-300 text-3xl cursor-pointer transition-all duration-300 favorite-icon">
-            favorite
-          </span>
-        </div>
-          <!-- Doctor Card footer-->
-          <div class="flex justify-around align-center pb-4">
-            <div class="text-left">
-              <div class="text-sm text-gray font-bold ">Next Avaliable at</div>
-              <div class="text-sm text-gray-500  ">10:30 AM - 21 April, Mon</div>
-            </div>
-            <div>
-              <div class="flex justify-center">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 flex items-center">
-                  <span class="material-symbols-outlined mr-[2px]">
-                    outpatient_med
-                  </span>
-                  Book A Visit
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-         class="bg-white md:rounded-2xl md:shadow text-center space-y-4 relative border  md:border-gray-300 ">
-          <div class="flex justify-center align-center p-3 border-1">
-            <div><img
-                src="https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg?t=st=1744740981~exp=1744744581~hmac=79e7c7f72f23586238daa13e9c4513aa1bdcb380dc88ff2a28cbd4252ea13e10&w=996"
-                class="w-[110px] h-[110px] rounded-full shadow p-1 object-cover" /></div>
-            <div class="flex-1 text-left p-3">
-              <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-[3px]"
-                  style="font-size: 15px;">Dermatologist</span>
-              <div class="text-lg font-semibold">Dr. Rakesh Kumar Mishra</div>
-              <div class="text-sm text-gray-500">MBBS, MD-Dermatology</div>
-            </div>
-          </div>
-          <hr class="mb-2 border-t border-gray-200" />
-          <div class="flex justify-between px-4">
-          <div class="text-left  ml-7">
-            <div class="text-sm text-gray font-bold clinicaddress">Basudha clinic</div>
-            <div class="text-sm text-gray-500 ">Barapali Pada, Bolangir</div>
-            <div class="text-sm text-gray-500 font-bold distance">Approx. 1.25 km</div>
-          </div>
-          <div class="pr-5">
-            <div class="text-sm text-gray-500 ">Fees</div>
-            <div class=" flex"> <span class="material-symbols-outlined text-sm text-gray font-bold">
-              currency_rupee
-              </span><div class="text-sm text-gray font-bold">800</div></div>
-          </div>
-        </div>
-        <div class="absolute top-[-10px] right-[12px] px-2 pl-4 py-2 cut-out">
-          <span class="material-symbols-outlined text-gray-300 text-3xl cursor-pointer transition-all duration-300 favorite-icon">
-            favorite
-          </span>
-        </div>
-          <!-- Doctor Card footer-->
-          <div class="flex justify-around align-center pb-4">
-            <div class="text-left">
-              <div class="text-sm text-gray font-bold ">Next Avaliable at</div>
-              <div class="text-sm text-gray-500  ">10:30 AM - 21 April, Mon</div>
-            </div>
-            <div>
-              <div class="flex justify-center">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 flex items-center">
-                  <span class="material-symbols-outlined mr-[2px]">
-                    outpatient_med
-                  </span>
-                  Book A Visit
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-         class="bg-white md:rounded-2xl md:shadow text-center space-y-4 relative border  md:border-gray-300 ">
-          <div class="flex justify-center align-center p-3 border-1">
-            <div><img
-                src="https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg?t=st=1744740981~exp=1744744581~hmac=79e7c7f72f23586238daa13e9c4513aa1bdcb380dc88ff2a28cbd4252ea13e10&w=996"
-                class="w-[110px] h-[110px] rounded-full shadow p-1 object-cover" /></div>
-            <div class="flex-1 text-left p-3">
-              <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-[3px]"
-                  style="font-size: 15px;">Dermatologist</span>
-              <div class="text-lg font-semibold">Dr. Rakesh Kumar Mishra</div>
-              <div class="text-sm text-gray-500">MBBS, MD-Dermatology</div>
-            </div>
-          </div>
-          <hr class="mb-2 border-t border-gray-200" />
-          <div class="flex justify-between px-4">
-          <div class="text-left  ml-7">
-            <div class="text-sm text-gray font-bold clinicaddress">Basudha clinic</div>
-            <div class="text-sm text-gray-500 ">Barapali Pada, Bolangir</div>
-            <div class="text-sm text-gray-500 font-bold distance">Approx. 1.25 km</div>
-          </div>
-          <div class="pr-5">
-            <div class="text-sm text-gray-500 ">Fees</div>
-            <div class=" flex"> <span class="material-symbols-outlined text-sm text-gray font-bold">
-              currency_rupee
-              </span><div class="text-sm text-gray font-bold">800</div></div>
-          </div>
-        </div>
-        <div class="absolute top-[-10px] right-[12px] px-2 pl-4 py-2 cut-out">
-          <span class="material-symbols-outlined text-gray-300 text-3xl cursor-pointer transition-all duration-300 favorite-icon">
-            favorite
-          </span>
-        </div>
-          <!-- Doctor Card footer-->
-          <div class="flex justify-around align-center pb-4">
-            <div class="text-left">
-              <div class="text-sm text-gray font-bold ">Next Avaliable at</div>
-              <div class="text-sm text-gray-500  ">10:30 AM - 21 April, Mon</div>
-            </div>
-            <div>
-              <div class="flex justify-center">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 flex items-center">
-                  <span class="material-symbols-outlined mr-[2px]">
-                    outpatient_med
-                  </span>
-                  Book A Visit
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-         class="bg-white md:rounded-2xl md:shadow text-center space-y-4 relative border  md:border-gray-300 ">
-          <div class="flex justify-center align-center p-3 border-1">
-            <div><img
-                src="https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg?t=st=1744740981~exp=1744744581~hmac=79e7c7f72f23586238daa13e9c4513aa1bdcb380dc88ff2a28cbd4252ea13e10&w=996"
-                class="w-[110px] h-[110px] rounded-full shadow p-1 object-cover" /></div>
-            <div class="flex-1 text-left p-3">
-              <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-[3px]"
-                  style="font-size: 15px;">Dermatologist</span>
-              <div class="text-lg font-semibold">Dr. Rakesh Kumar Mishra</div>
-              <div class="text-sm text-gray-500">MBBS, MD-Dermatology</div>
-            </div>
-          </div>
-          <hr class="mb-2 border-t border-gray-200" />
-          <div class="flex justify-between px-4">
-          <div class="text-left  ml-7">
-            <div class="text-sm text-gray font-bold clinicaddress">Basudha clinic</div>
-            <div class="text-sm text-gray-500 ">Barapali Pada, Bolangir</div>
-            <div class="text-sm text-gray-500 font-bold distance">Approx. 1.25 km</div>
-          </div>
-          <div class="pr-5">
-            <div class="text-sm text-gray-500 ">Fees</div>
-            <div class=" flex"> <span class="material-symbols-outlined text-sm text-gray font-bold">
-              currency_rupee
-              </span><div class="text-sm text-gray font-bold">800</div></div>
-          </div>
-        </div>
-        <div class="absolute top-[-10px] right-[12px] px-2 pl-4 py-2 cut-out">
-          <span class="material-symbols-outlined text-gray-300 text-3xl cursor-pointer transition-all duration-300 favorite-icon">
-            favorite
-          </span>
-        </div>
-          <!-- Doctor Card footer-->
-          <div class="flex justify-around align-center pb-4">
-            <div class="text-left">
-              <div class="text-sm text-gray font-bold ">Next Avaliable at</div>
-              <div class="text-sm text-gray-500  ">10:30 AM - 21 April, Mon</div>
-            </div>
-            <div>
-              <div class="flex justify-center">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 flex items-center">
-                  <span class="material-symbols-outlined mr-[2px]">
-                    outpatient_med
-                  </span>
-                  Book A Visit
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-         class="bg-white md:rounded-2xl md:shadow text-center space-y-4 relative border  md:border-gray-300 ">
-          <div class="flex justify-center align-center p-3 border-1">
-            <div><img
-                src="https://img.freepik.com/free-photo/pleased-young-female-doctor-wearing-medical-robe-stethoscope-around-neck-standing-with-closed-posture_409827-254.jpg?t=st=1744740981~exp=1744744581~hmac=79e7c7f72f23586238daa13e9c4513aa1bdcb380dc88ff2a28cbd4252ea13e10&w=996"
-                class="w-[110px] h-[110px] rounded-full shadow p-1 object-cover" /></div>
-            <div class="flex-1 text-left p-3">
-              <span class="bg-blue-100 text-blue-600 text-xs px-3 py-1 rounded-[3px]"
-                  style="font-size: 15px;">Dermatologist</span>
-              <div class="text-lg font-semibold">Dr. Rakesh Kumar Mishra</div>
-              <div class="text-sm text-gray-500">MBBS, MD-Dermatology</div>
-            </div>
-          </div>
-          <hr class="mb-2 border-t border-gray-200" />
-          <div class="flex justify-between px-4">
-          <div class="text-left  ml-7">
-            <div class="text-sm text-gray font-bold clinicaddress">Basudha clinic</div>
-            <div class="text-sm text-gray-500 ">Barapali Pada, Bolangir</div>
-            <div class="text-sm text-gray-500 font-bold distance">Approx. 1.25 km</div>
-          </div>
-          <div class="pr-5">
-            <div class="text-sm text-gray-500 ">Fees</div>
-            <div class=" flex"> <span class="material-symbols-outlined text-sm text-gray font-bold">
-              currency_rupee
-              </span><div class="text-sm text-gray font-bold">800</div></div>
-          </div>
-        </div>
-        <div class="absolute top-[-10px] right-[12px] px-2 pl-4 py-2 cut-out">
-          <span class="material-symbols-outlined text-gray-300 text-3xl cursor-pointer transition-all duration-300 favorite-icon">
-            favorite
-          </span>
-        </div>
-          <!-- Doctor Card footer-->
-          <div class="flex justify-around align-center pb-4">
-            <div class="text-left">
-              <div class="text-sm text-gray font-bold ">Next Avaliable at</div>
-              <div class="text-sm text-gray-500  ">10:30 AM - 21 April, Mon</div>
-            </div>
-            <div>
-              <div class="flex justify-center">
-                <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 flex items-center">
-                  <span class="material-symbols-outlined mr-[2px]">
-                    outpatient_med
-                  </span>
-                  Book A Visit
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-
-
-
-        <!-- ...Repeat for Gabriel Holt, Lois Saunders, Owen Larson, Teresa Schwartz, Mary Garcia, Earl Hopkins -->
-
-      </div>
-
-    </div>
-
-
-  </main>
-
-  <!-- ✅ JS -->
-  <script>
-    const toggleBtn = document.getElementById('menu-toggle');
-    const sidebar = document.getElementById('sidebar');
-    const iconOpen = document.getElementById('icon-open');
-    const iconClose = document.getElementById('icon-close');
-    const overlay = document.getElementById('overlay');
-
-    toggleBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('translate-x-full');
-      iconOpen.classList.toggle('hidden');
-      iconClose.classList.toggle('hidden');
-      overlay.classList.toggle('hidden');
-    });
-
-    overlay.addEventListener('click', () => {
-      sidebar.classList.add('translate-x-full');
-      iconOpen.classList.remove('hidden');
-      iconClose.classList.add('hidden');
-      overlay.classList.add('hidden');
-    });
-  </script>
-
-
-
-  <script>
-    const categories = [
-      "All", "Cardiology", "Orthopedics", "Oncology", "Dermatology",
-      "Surgery", "Gynocology", "Pediatrics", "ENT", "Neurology",
-      "Psychiatry", "Urology", "Nephrology"
-    ];
-
-    const container = document.getElementById("category-container");
-    let showingAll = false;
-    let selectedCategories = []; // store selected ones
-
-    function renderCategories(limit = 7) {
-      container.innerHTML = '';
-      const visibleCategories = categories.slice(0, limit);
-
-      visibleCategories.forEach(cat => {
-        const label = document.createElement("label");
-        label.className =
-          "category-label text-sm px-4 py-1 rounded-full md:hover:bg-gray-200 cursor-pointer flex items-center gap-1 transition";
-
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.className = "hidden";
-        checkbox.name = "category";
-        checkbox.value = cat;
-
-        // Restore previous selection
-        if (selectedCategories.includes(cat)) {
-          checkbox.checked = true;
-          label.classList.add("bg-blue-600", "text-white");
-        } else {
-          label.classList.add("bg-gray-100", "text-gray-700");
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Firebase Chat</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+        
+        body {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            height: 95vh;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            overflow: hidden;
+        }
+        
+        .sidebar {
+            width: 320px;
+            background-color: #f5f7fb;
+            border-right: 1px solid #e6e6e6;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+        
+        .user-profile {
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: white;
+            border-bottom: 1px solid #e6e6e6;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #6e8efb;
+        }
+        
+        .user-info h3 {
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .user-info p {
+            font-size: 12px;
+            color: #6e8efb;
+        }
+        
+        .contact-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+        
+        .contact {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .contact:hover {
+            background-color: #e9edf5;
+        }
+        
+        .contact.active {
+            background-color: #e1e8f7;
+            border-left: 3px solid #6e8efb;
+        }
+        
+        .contact-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .contact-info h4 {
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .contact-info p {
+            font-size: 12px;
+            color: #777;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+        
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        
+        .chat-header {
+            padding: 15px 20px;
+            background-color: white;
+            border-bottom: 1px solid #e6e6e6;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #6e8efb;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .chat-header-info h3 {
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .chat-header-info p {
+            font-size: 12px;
+            color: #6e8efb;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #f5f7fb;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-end;
+            max-width: 85%;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .message.received {
+            align-self: flex-start;
+        }
+        
+        .message.sent {
+            align-self: flex-end;
+            margin-left: auto;
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 8px;
+            flex-shrink: 0;
+        }
+        
+        .message-content {
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 100%;
+            word-wrap: break-word;
+            position: relative;
+        }
+        
+        .received .message-content {
+            background-color: white;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .sent .message-content {
+            background-color: #6e8efb;
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .message-time {
+            font-size: 11px;
+            color: #999;
+            margin-top: 5px;
+            text-align: right;
+        }
+        
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #e6e6e6;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 24px;
+            outline: none;
+            font-size: 14px;
+            min-width: 50px;
+        }
+        
+        .chat-input button {
+            margin-left: 10px;
+            padding: 10px 20px;
+            background-color: #6e8efb;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        
+        .chat-input button:hover {
+            background-color: #5a7dfa;
+        }
+        
+        .typing-indicator {
+            padding: 5px 15px;
+            font-style: italic;
+            color: #999;
+            font-size: 12px;
+            display: none;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        
+        .login-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .login-container input {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            outline: none;
+            font-size: 14px;
+        }
+        
+        .login-container button {
+            width: 100%;
+            padding: 12px;
+            background-color: #6e8efb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        
+        .login-container button:hover {
+            background-color: #5a7dfa;
+        }
+        
+        .user-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .user-option {
+            flex: 1;
+            min-width: 120px;
+            padding: 15px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .user-option:hover {
+            background-color: #f5f7fb;
+        }
+        
+        .user-option.selected {
+            background-color: #6e8efb;
+            color: white;
+            border-color: #6e8efb;
+        }
+        
+        .firebase-info {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #666;
+            text-align: left;
+        }
+        
+        .firebase-info h3 {
+            margin-bottom: 10px;
+            color: #333;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .status-online {
+            background-color: #4CAF50;
+        }
+        
+        .status-offline {
+            background-color: #f44336;
+        }
+        
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        
+        .connection-connected {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .connection-disconnected {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        /* Mobile Styles */
+        @media (max-width: 900px) {
+            .container {
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .sidebar {
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                z-index: 10;
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .user-profile {
+                padding: 15px;
+            }
+            
+            .user-avatar {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .chat-header {
+                padding: 12px 15px;
+            }
+            
+            .chat-messages {
+                padding: 15px;
+            }
+            
+            .message-content {
+                padding: 8px 12px;
+            }
+            
+            .chat-input {
+                padding: 12px;
+            }
+            
+            .chat-input button {
+                padding: 10px 15px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                height: 100vh;
+            }
+            
+            .login-container {
+                padding: 20px;
+            }
+            
+            .user-selector {
+                flex-direction: column;
+            }
+            
+            .user-option {
+                min-width: auto;
+            }
+            
+            .message {
+                max-width: 95%;
+            }
+            
+            .message-avatar {
+                width: 28px;
+                height: 28px;
+            }
+            
+            .chat-input button span {
+                display: none;
+            }
+            
+            .chat-input button {
+                padding: 10px;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .mobile-menu-btn {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Connection Status -->
+    <div id="connectionStatus" class="connection-status connection-disconnected" style="display: none;">
+        Connecting to Firebase...
+    </div>
 
-        checkbox.addEventListener("change", () => {
-          if (checkbox.checked) {
-            label.classList.remove("bg-gray-100", "text-gray-700");
-            label.classList.add("bg-blue-600", "text-white");
-            selectedCategories.push(cat);
-          } else {
-            label.classList.remove("bg-blue-600", "text-white");
-            label.classList.add("bg-gray-100", "text-gray-700");
-            selectedCategories = selectedCategories.filter(c => c !== cat);
-          }
-
-          console.log("Selected Categories:", selectedCategories);
-        });
-
-        label.appendChild(checkbox);
-        label.appendChild(document.createTextNode(cat));
-        container.appendChild(label);
-      });
-
-      // Add View All / Show Less Button
-      const viewBtn = document.createElement("button");
-      viewBtn.className = "bg-blue-600 text-white text-sm px-4 py-1 rounded-full";
-      viewBtn.textContent = showingAll ? "Show Less" : "View All";
-
-      viewBtn.addEventListener("click", () => {
-        showingAll = !showingAll;
-        renderCategories(showingAll ? categories.length : 7);
-      });
-
-      container.appendChild(viewBtn);
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <h2>Real-Time Firebase Chat</h2>
+        <p style="margin-bottom: 20px; color: #666;">Select your user to start chatting</p>
+        
+        <div class="user-selector">
+            <div class="user-option" onclick="selectUser('user1')">
+                <i class="fas fa-user" style="font-size: 24px; margin-bottom: 5px;"></i>
+                <div>Alex Johnson</div>
+            </div>
+            <div class="user-option" onclick="selectUser('user2')">
+                <i class="fas fa-user" style="font-size: 24px; margin-bottom: 5px;"></i>
+                <div>Sam Wilson</div>
+            </div>
+        </div>
+        
+        <input type="text" id="username" placeholder="Enter your name" value="Alex Johnson" readonly>
+        <button onclick="login()">Start Chatting</button>
+        
+        <div class="firebase-info">
+            <h3>Firebase Setup Instructions</h3>
+            <p><strong>If you're getting errors, follow these steps:</strong></p>
+            <ol style="margin-left: 20px; margin-top: 10px;">
+                <li>Go to <a href="https://console.firebase.google.com/" target="_blank">Firebase Console</a></li>
+                <li>Create a new project or use existing one</li>
+                <li>Enable Firestore Database</li>
+                <li>Go to Project Settings > General</li>
+                <li>Copy your Firebase config and replace the config in the code</li>
+                <li>In Firestore > Rules, set to:
+                    <pre style="background: #f5f5f5; padding: 10px; margin: 10px 0; border-radius: 4px;">
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if true;
     }
+  }
+}</pre>
+                </li>
+            </ol>
+        </div>
+    </div>
+    
+    <!-- Chat Interface -->
+    <div id="chatScreen" class="container" style="display: none;">
+        <div class="sidebar" id="sidebar">
+            <div class="user-profile">
+                <img src="https://i.pravatar.cc/150?img=5" alt="User" class="user-avatar" id="currentUserAvatar">
+                <div class="user-info">
+                    <h3 id="currentUserName">Alex Johnson</h3>
+                    <p id="userStatus"><span class="status-indicator status-online"></span>Online</p>
+                </div>
+            </div>
+            
+            <div class="contact-list">
+                <div class="contact active">
+                    <img src="https://i.pravatar.cc/150?img=12" alt="Contact" class="contact-avatar">
+                    <div class="contact-info">
+                        <h4 id="contactName">Sam Wilson</h4>
+                        <p id="contactStatus"><span class="status-indicator status-online"></span>Online</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-area">
+            <div class="chat-header">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <img src="https://i.pravatar.cc/150?img=12" alt="Contact" class="user-avatar">
+                <div class="chat-header-info">
+                    <h3 id="chatContactName">Sam Wilson</h3>
+                    <p id="chatContactStatus"><span class="status-indicator status-online"></span>Online</p>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will be loaded here from Firebase -->
+                <div class="message received">
+                    <img src="https://i.pravatar.cc/150?img=12" alt="Alex" class="message-avatar">
+                    <div class="message-content">
+                        <p>Welcome to the real-time chat! Messages are synced with Firebase.</p>
+                        <div class="message-time" id="welcome-time">Just now</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator">
+                <span id="typingText">Someone is typing...</span>
+            </div>
+            
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Type a message...">
+                <button id="sendButton">
+                    <i class="fas fa-paper-plane"></i> <span>Send</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
-    // Initial render
-    renderCategories();
-  </script>
-  <script>
-    document.querySelectorAll('.favorite-icon').forEach(icon => {
-      icon.addEventListener('click', () => {
-        icon.classList.toggle('text-red-500'); // fill red
-        icon.classList.toggle('scale-125');    // grow slightly
-        icon.classList.toggle('fill');         // switch to filled heart if using material symbols
-      });
-    });
-  </script>
-  
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
+    <script>
+        // Firebase Configuration - REPLACE WITH YOUR CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyBnPD7v-8IGqrYepC2RvJDJRS2gFFvl2f8",
+            authDomain: "student-database-e3f5c.firebaseapp.com",
+            databaseURL: "https://student-database-e3f5c.firebaseio.com",
+            projectId: "student-database-e3f5c",
+            storageBucket: "student-database-e3f5c.firebasestorage.app",
+            messagingSenderId: "502335602197",
+            appId: "1:502335602197:web:7eea29a2b2402d98e1d81c",
+            measurementId: "G-DD9RHLS83Z"
+        };
+        
+        // App State
+        let currentUser = '';
+        let currentUserId = '';
+        let unsubscribeMessages = null;
+        let firebaseInitialized = false;
+        let db = null;
+        
+        // DOM Elements
+        const loginScreen = document.getElementById('loginScreen');
+        const chatScreen = document.getElementById('chatScreen');
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const currentUserName = document.getElementById('currentUserName');
+        const currentUserAvatar = document.getElementById('currentUserAvatar');
+        const contactName = document.getElementById('contactName');
+        const chatContactName = document.getElementById('chatContactName');
+        const sidebar = document.getElementById('sidebar');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const connectionStatus = document.getElementById('connectionStatus');
+        
+        // Initialize Firebase with error handling
+        function initializeFirebase() {
+            try {
+                // Initialize Firebase
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                
+                // Enable offline persistence
+                db.enablePersistence()
+                    .then(() => {
+                        console.log("Firebase persistence enabled");
+                    })
+                    .catch((err) => {
+                        console.log("Persistence failed: ", err);
+                    });
+                
+                // Monitor connection state
+                firebase.firestore().enableNetwork()
+                    .then(() => {
+                        console.log("Firebase connected");
+                        updateConnectionStatus(true);
+                    })
+                    .catch((error) => {
+                        console.error("Firebase connection error: ", error);
+                        updateConnectionStatus(false);
+                    });
+                
+                firebaseInitialized = true;
+                console.log("Firebase initialized successfully");
+                
+            } catch (error) {
+                console.error("Firebase initialization error: ", error);
+                updateConnectionStatus(false);
+                showError("Firebase initialization failed. Using demo mode.");
+                // Continue in demo mode
+                firebaseInitialized = false;
+            }
+        }
+        
+        // Update connection status display
+        function updateConnectionStatus(connected) {
+            connectionStatus.style.display = 'block';
+            if (connected) {
+                connectionStatus.textContent = 'Connected to Firebase';
+                connectionStatus.className = 'connection-status connection-connected';
+            } else {
+                connectionStatus.textContent = 'Disconnected - Using Demo Mode';
+                connectionStatus.className = 'connection-status connection-disconnected';
+            }
+        }
+        
+        // Show error message
+        function showError(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.style.cssText = `
+                position: fixed;
+                top: 50px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: #f44336;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 4px;
+                z-index: 1000;
+                max-width: 80%;
+                text-align: center;
+            `;
+            errorDiv.textContent = message;
+            document.body.appendChild(errorDiv);
+            
+            setTimeout(() => {
+                document.body.removeChild(errorDiv);
+            }, 5000);
+        }
+        
+        // User Selection
+        function selectUser(user) {
+            const userOptions = document.querySelectorAll('.user-option');
+            userOptions.forEach(option => option.classList.remove('selected'));
+            
+            event.currentTarget.classList.add('selected');
+            
+            if (user === 'user1') {
+                document.getElementById('username').value = 'Alex Johnson';
+                currentUserId = 'user1';
+            } else {
+                document.getElementById('username').value = 'Sam Wilson';
+                currentUserId = 'user2';
+            }
+        }
+        
+        // Login Function
+        function login() {
+            currentUser = document.getElementById('username').value;
+            
+            if (!currentUser) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            // Set user info in UI
+            currentUserName.textContent = currentUser;
+            const otherUser = currentUser === 'Alex Johnson' ? 'Sam Wilson' : 'Alex Johnson';
+            contactName.textContent = otherUser;
+            chatContactName.textContent = otherUser;
+            
+            // Set avatars
+            currentUserAvatar.src = currentUser === 'Alex Johnson' 
+                ? 'https://i.pravatar.cc/150?img=5' 
+                : 'https://i.pravatar.cc/150?img=12';
+            
+            // Show chat interface
+            loginScreen.style.display = 'none';
+            chatScreen.style.display = 'flex';
+            
+            // Initialize Firebase if not already done
+            if (!firebaseInitialized) {
+                initializeFirebase();
+            }
+            
+            // Load messages
+            loadMessages();
+            
+            // Set up real-time listener for new messages
+            setupMessageListener();
+        }
+        
+        // Load messages from Firestore
+        function loadMessages() {
+            if (!firebaseInitialized || !db) {
+                console.log("Firebase not available, using demo mode");
+                showDemoMessage();
+                return;
+            }
+            
+            // Clear existing messages except the welcome message
+            const welcomeMsg = document.querySelector('.message.received');
+            chatMessages.innerHTML = '';
+            if (welcomeMsg) {
+                chatMessages.appendChild(welcomeMsg);
+            }
+            
+            // Fetch messages from Firestore
+            db.collection('messages')
+                .orderBy('timestamp', 'asc')
+                .get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const message = doc.data();
+                        displayMessage(message, false);
+                    });
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                })
+                .catch((error) => {
+                    console.error("Error loading messages: ", error);
+                    showDemoMessage();
+                });
+        }
+        
+        // Show demo message when Firebase fails
+        function showDemoMessage() {
+            const demoMsg = document.createElement('div');
+            demoMsg.className = 'message received';
+            demoMsg.innerHTML = `
+                <img src="https://i.pravatar.cc/150?img=12" alt="System" class="message-avatar">
+                <div class="message-content">
+                    <p><strong>Demo Mode:</strong> Firebase connection failed. Messages won't be saved.</p>
+                    <div class="message-time">System</div>
+                </div>
+            `;
+            chatMessages.appendChild(demoMsg);
+        }
+        
+        // Set up real-time listener for new messages
+        function setupMessageListener() {
+            if (!firebaseInitialized || !db) return;
+            
+            unsubscribeMessages = db.collection('messages')
+                .orderBy('timestamp', 'asc')
+                .onSnapshot((querySnapshot) => {
+                    querySnapshot.docChanges().forEach((change) => {
+                        if (change.type === "added") {
+                            const message = change.doc.data();
+                            if (message.senderId !== currentUserId) {
+                                displayMessage(message, true);
+                            }
+                        }
+                    });
+                }, (error) => {
+                    console.error("Message listener error: ", error);
+                });
+        }
+        
+        // Send message function
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+            
+            if (!messageText) return;
+            
+            // Create message object
+            const message = {
+                text: messageText,
+                sender: currentUser,
+                senderId: currentUserId,
+                timestamp: new Date()
+            };
+            
+            // Display message immediately for better UX
+            displayMessage(message, true);
+            messageInput.value = '';
+            
+            // Try to save to Firebase if available
+            if (firebaseInitialized && db) {
+                message.timestamp = firebase.firestore.FieldValue.serverTimestamp();
+                
+                db.collection('messages').add(message)
+                    .then(() => {
+                        console.log("Message saved to Firebase");
+                    })
+                    .catch((error) => {
+                        console.error("Error saving message to Firebase: ", error);
+                        showError("Message saved locally (Firebase error)");
+                    });
+            } else {
+                showError("Message saved locally (Demo mode)");
+            }
+        }
+        
+        // Display message in chat
+        function displayMessage(message, animate = true) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${message.senderId === currentUserId ? 'sent' : 'received'}`;
+            
+            if (animate) {
+                messageDiv.style.animation = 'fadeIn 0.3s ease';
+            }
+            
+            const avatarSrc = message.senderId === currentUserId 
+                ? (currentUser === 'Alex Johnson' ? 'https://i.pravatar.cc/150?img=5' : 'https://i.pravatar.cc/150?img=12')
+                : (currentUser === 'Alex Johnson' ? 'https://i.pravatar.cc/150?img=12' : 'https://i.pravatar.cc/150?img=5');
+            
+            // Format timestamp
+            let timeString = 'Just now';
+            if (message.timestamp) {
+                if (message.timestamp.toDate) {
+                    const date = message.timestamp.toDate();
+                    timeString = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                } else if (message.timestamp instanceof Date) {
+                    timeString = message.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                }
+            }
+            
+            messageDiv.innerHTML = `
+                <img src="${avatarSrc}" alt="${message.sender}" class="message-avatar">
+                <div class="message-content">
+                    <p>${message.text}</p>
+                    <div class="message-time">${timeString}</div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Mobile menu toggle
+        mobileMenuBtn.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+        });
+        
+        // Close sidebar when clicking on a message on mobile
+        chatMessages.addEventListener('click', function() {
+            if (window.innerWidth <= 900) {
+                sidebar.classList.remove('active');
+            }
+        });
+        
+        // Event Listeners
+        sendButton.addEventListener('click', sendMessage);
+        
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 900) {
+                sidebar.classList.remove('active');
+            }
+        });
+        
+        // Handle page unload
+        window.addEventListener('beforeunload', function() {
+            if (unsubscribeMessages) {
+                unsubscribeMessages();
+            }
+        });
+        
+        // Initialize by selecting first user and initializing Firebase
+        selectUser('user1');
+        initializeFirebase();
+    </script>
 </body>
-
 </html>
