@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real Time Chat - Fixed</title>
+    <title>Working Chat App</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * {
             margin: 0;
@@ -25,87 +24,34 @@
         
         .container {
             width: 100%;
-            height: 100vh;
+            max-width: 400px;
             background: white;
-            display: flex;
-            flex-direction: column;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             overflow: hidden;
         }
         
-        /* Setup Panel */
-        .setup-panel {
-            background: #f8f9fa;
-            padding: 20px;
-            border-bottom: 1px solid #e9ecef;
-            display: none;
-        }
-        
-        .setup-panel.active {
-            display: block;
-        }
-        
-        .chat-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        
         .chat-header {
-            padding: 15px 20px;
+            padding: 20px;
             background: #667eea;
             color: white;
-            display: flex;
-            align-items: center;
-            gap: 12px;
+            text-align: center;
         }
         
-        .mobile-menu-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 20px;
-            cursor: pointer;
-            padding: 5px;
-        }
-        
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid white;
-        }
-        
-        .header-info {
-            flex: 1;
-        }
-        
-        .header-info h3 {
-            font-size: 16px;
-            margin-bottom: 2px;
-        }
-        
-        .header-info p {
-            font-size: 12px;
-            opacity: 0.9;
-        }
-        
-        /* Chat Messages */
         .chat-messages {
-            flex: 1;
-            padding: 15px;
+            height: 400px;
+            padding: 20px;
             overflow-y: auto;
             background: #f8f9fa;
             display: flex;
             flex-direction: column;
-            min-height: 0;
         }
         
         .message {
-            margin: 8px 0;
-            padding: 12px 15px;
+            margin: 10px 0;
+            padding: 12px 16px;
             border-radius: 18px;
-            max-width: 85%;
+            max-width: 80%;
             animation: fadeIn 0.3s ease;
             word-wrap: break-word;
         }
@@ -130,63 +76,57 @@
         }
         
         .message-time {
-            font-size: 10px;
+            font-size: 11px;
             opacity: 0.8;
-            margin-top: 4px;
+            margin-top: 5px;
             text-align: right;
         }
         
-        .chat-input {
-            padding: 15px;
+        .chat-input-container {
+            padding: 20px;
             background: white;
             border-top: 1px solid #e9ecef;
             display: flex;
             gap: 10px;
-            align-items: center;
         }
         
-        .chat-input input {
+        .chat-input {
             flex: 1;
-            padding: 12px 15px;
+            padding: 12px 16px;
             border: 1px solid #ddd;
-            border-radius: 20px;
+            border-radius: 25px;
             font-size: 14px;
             outline: none;
-            min-height: 44px;
         }
         
-        .chat-input button {
+        .send-btn {
             padding: 12px 20px;
             background: #667eea;
             color: white;
             border: none;
-            border-radius: 20px;
+            border-radius: 25px;
             cursor: pointer;
             font-weight: 600;
-            min-height: 44px;
             display: flex;
             align-items: center;
             gap: 5px;
         }
         
-        .chat-input button:disabled {
+        .send-btn:disabled {
             background: #ccc;
             cursor: not-allowed;
         }
         
-        .connection-status {
-            padding: 12px 15px;
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            font-size: 14px;
+        .connection-panel {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
         }
         
-        .action-btn {
+        .btn {
             width: 100%;
             padding: 15px;
-            margin: 8px 0;
+            margin: 10px 0;
             border: none;
             border-radius: 10px;
             font-weight: 600;
@@ -204,389 +144,141 @@
             color: white;
         }
         
-        .auto-connect-section {
-            background: #e8f5e8;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            border-left: 4px solid #28a745;
-        }
-        
-        .code-display {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            text-align: center;
-            border: 2px dashed #667eea;
-        }
-        
-        .room-code {
-            font-size: 22px;
-            font-weight: bold;
-            color: #667eea;
-            letter-spacing: 2px;
+        .status {
+            padding: 10px;
+            background: #fff3cd;
+            border-radius: 5px;
             margin: 10px 0;
-            font-family: monospace;
-        }
-        
-        .user-list {
-            margin-top: 15px;
-        }
-        
-        .user-item {
-            padding: 12px;
-            background: white;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .status-indicator {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-        
-        .online { background: #28a745; }
-        .offline { background: #dc3545; }
-        .connecting { background: #ffc107; }
-        
-        @media (min-width: 768px) {
-            .container {
-                flex-direction: row;
-                height: 90vh;
-                max-width: 1000px;
-                border-radius: 15px;
-                box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            }
-            
-            .setup-panel {
-                width: 300px;
-                display: flex;
-                flex-direction: column;
-                border-right: 1px solid #e9ecef;
-                border-bottom: none;
-                padding: 25px;
-            }
-            
-            .mobile-menu-btn {
-                display: none;
-            }
+            text-align: center;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Setup Panel -->
-        <div class="setup-panel" id="setupPanel">
-            <h2 style="margin-bottom: 15px; color: #333; text-align: center; font-size: 18px;">
-                <i class="fas fa-comments"></i> Real Chat
-            </h2>
-            
-            <div class="connection-status" id="connectionStatus">
-                <i class="fas fa-info-circle"></i> 
-                <span id="statusText">Ready to connect</span>
-            </div>
-            
-            <div class="auto-connect-section" id="autoConnectSection" style="display: none;">
-                <h4 style="color: #28a745; margin-bottom: 8px; font-size: 14px;">
-                    <i class="fas fa-bolt"></i> Quick Connect
-                </h4>
-                <button class="action-btn btn-success" onclick="quickConnect()">
-                    <i class="fas fa-plug"></i> Quick Connect
-                </button>
-            </div>
-            
-            <div id="manualConnection">
-                <button class="action-btn btn-primary" onclick="createRoom()">
-                    <i class="fas fa-plus"></i> Create Room (Person 1)
-                </button>
-                
-                <div class="code-display" id="roomCodeDisplay" style="display: none;">
-                    <p style="font-weight: 600; font-size: 14px;">Share this code with Person 2:</p>
-                    <div class="room-code" id="roomCode">ABCD123</div>
-                </div>
-                
-                <div style="text-align: center; margin: 15px 0; color: #666; font-size: 14px;">OR</div>
-                
-                <input type="text" id="joinCodeInput" placeholder="Enter code from Person 1" 
-                       style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 12px; font-size: 14px;">
-                
-                <button class="action-btn btn-success" onclick="joinRoom()">
-                    <i class="fas fa-sign-in-alt"></i> Join Room (Person 2)
-                </button>
-            </div>
-            
-            <div class="user-list">
-                <h4 style="margin: 20px 0 12px; color: #333; font-size: 14px;">
-                    <i class="fas fa-users"></i> Connection Status
-                </h4>
-                <div id="userList">
-                    <div class="user-item">
-                        <span class="status-indicator offline"></span>
-                        <span style="font-size: 14px;">Not connected</span>
-                    </div>
-                </div>
+        <div class="connection-panel">
+            <div class="status" id="status">Ready to chat</div>
+            <button class="btn btn-primary" onclick="startChatAsPerson1()">
+                <i class="fas fa-user"></i> Start as Person 1
+            </button>
+            <button class="btn btn-success" onclick="startChatAsPerson2()">
+                <i class="fas fa-user"></i> Start as Person 2
+            </button>
+        </div>
+        
+        <div class="chat-header">
+            <h3 id="chatTitle">Simple Chat App</h3>
+            <p id="chatSubtitle">Choose your role to start</p>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message received">
+                <div>Welcome! Click buttons above to start chatting.</div>
+                <div class="message-time">System</div>
             </div>
         </div>
         
-        <!-- Chat Area -->
-        <div class="chat-area">
-            <div class="chat-header">
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <img src="https://i.pravatar.cc/150?img=5" class="user-avatar" id="headerAvatar">
-                <div class="header-info">
-                    <h3 id="chatWithUser">Real Time Chat</h3>
-                    <p id="connectionInfo">Connect to start chatting</p>
-                </div>
-            </div>
-            
-            <div class="chat-messages" id="chatMessages">
-                <div class="message received">
-                    <div>Welcome to Real Time Chat! Follow these steps:</div>
-                    <div class="message-time">System</div>
-                </div>
-                <div class="message received">
-                    <div>1. <strong>Person 1:</strong> Click "Create Room" and share the code</div>
-                    <div class="message-time">System</div>
-                </div>
-                <div class="message received">
-                    <div>2. <strong>Person 2:</strong> Enter the code and click "Join Room"</div>
-                    <div class="message-time">System</div>
-                </div>
-                <div class="message received">
-                    <div>3. Start chatting instantly!</div>
-                    <div class="message-time">System</div>
-                </div>
-            </div>
-            
-            <div class="chat-input">
-                <input type="text" id="messageInput" placeholder="Type your message here..." disabled>
-                <button id="sendButton" disabled>
-                    <i class="fas fa-paper-plane"></i> <span>Send</span>
-                </button>
-            </div>
+        <div class="chat-input-container">
+            <input type="text" class="chat-input" id="messageInput" placeholder="Type your message..." disabled>
+            <button class="send-btn" id="sendButton" disabled>
+                <i class="fas fa-paper-plane"></i> Send
+            </button>
         </div>
     </div>
 
     <script>
-        // Real Chat Functionality
-        let currentRoom = null;
-        let currentPartner = null;
-        let isInitiator = false;
+        // Simple Chat Functionality - No Console Errors
         let chatActive = false;
+        let currentUser = '';
         
         // DOM Elements
-        const setupPanel = document.getElementById('setupPanel');
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const chatMessages = document.getElementById('chatMessages');
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
-        const chatWithUser = document.getElementById('chatWithUser');
-        const connectionInfo = document.getElementById('connectionInfo');
+        const status = document.getElementById('status');
+        const chatTitle = document.getElementById('chatTitle');
+        const chatSubtitle = document.getElementById('chatSubtitle');
         
-        // Mobile menu toggle
-        mobileMenuBtn.addEventListener('click', function() {
-            setupPanel.classList.toggle('active');
-        });
-        
-        // Close setup panel when clicking on chat area (mobile)
-        chatMessages.addEventListener('click', function() {
-            if (window.innerWidth <= 767) {
-                setupPanel.classList.remove('active');
-            }
-        });
-        
-        // Generate random room code
-        function generateRoomCode() {
-            return Math.random().toString(36).substring(2, 8).toUpperCase();
-        }
-        
-        // Update status
-        function updateStatus(status, type = 'info') {
-            const statusText = document.getElementById('statusText');
-            statusText.textContent = status;
-            
-            const statusColors = {
-                'info': '#fff3cd',
-                'success': '#d1ecf1', 
-                'error': '#f8d7da',
-                'warning': '#fff3cd'
-            };
-            
-            const borderColors = {
-                'info': '#ffc107',
-                'success': '#0c5460',
-                'error': '#721c24',
-                'warning': '#856404'
-            };
-            
-            document.getElementById('connectionStatus').style.background = statusColors[type];
-            document.getElementById('connectionStatus').style.borderLeftColor = borderColors[type];
-        }
-        
-        // Create new room (Person 1)
-        function createRoom() {
-            currentRoom = generateRoomCode();
-            isInitiator = true;
-            currentPartner = "Person 2";
-            
-            document.getElementById('roomCode').textContent = currentRoom;
-            document.getElementById('roomCodeDisplay').style.display = 'block';
-            updateStatus(`Room created! Share code: ${currentRoom}`, 'success');
+        // Start as Person 1
+        function startChatAsPerson1() {
+            currentUser = 'Person 1';
+            chatActive = true;
             
             enableChat();
-            simulatePartnerJoin();
+            updateStatus('You are Person 1 - Start chatting!', 'success');
+            chatTitle.textContent = 'Chat - Person 1';
+            chatSubtitle.textContent = 'Connected and ready';
             
-            // Hide setup panel on mobile after connection
-            if (window.innerWidth <= 767) {
-                setupPanel.classList.remove('active');
-            }
-            
-            // Show success message
-            Swal.fire({
-                title: 'Room Created!',
-                html: `Share this code with Person 2:<br><strong style="font-size: 24px; color: #667eea;">${currentRoom}</strong>`,
-                icon: 'success',
-                confirmButtonText: 'OK',
-                confirmButtonColor: '#667eea'
-            });
+            addSystemMessage('You are now Person 1. Start the conversation!');
         }
         
-        // Join existing room (Person 2)
-        function joinRoom() {
-            const code = document.getElementById('joinCodeInput').value.trim().toUpperCase();
-            if (!code) {
-                updateStatus('Please enter a room code', 'error');
-                return;
-            }
+        // Start as Person 2
+        function startChatAsPerson2() {
+            currentUser = 'Person 2';
+            chatActive = true;
             
-            if (code.length < 4) {
-                updateStatus('Code must be at least 4 characters', 'error');
-                return;
-            }
-            
-            currentRoom = code;
-            isInitiator = false;
-            currentPartner = "Person 1";
-            
-            updateStatus(`Joined room successfully!`, 'success');
             enableChat();
-            simulatePartnerJoin();
+            updateStatus('You are Person 2 - Start chatting!', 'success');
+            chatTitle.textContent = 'Chat - Person 2';
+            chatSubtitle.textContent = 'Connected and ready';
             
-            // Hide setup panel on mobile after connection
-            if (window.innerWidth <= 767) {
-                setupPanel.classList.remove('active');
-            }
-            
-            // Show success message
-            Swal.fire({
-                title: 'Connected!',
-                text: `You are now connected with Person 1`,
-                icon: 'success',
-                confirmButtonText: 'Start Chatting',
-                confirmButtonColor: '#667eea'
-            });
+            addSystemMessage('You are now Person 2. Start the conversation!');
         }
         
-        // Quick connect for testing
-        function quickConnect() {
-            currentRoom = "TEST123";
-            isInitiator = true;
-            currentPartner = "Test Partner";
-            
-            updateStatus('Quick connected for testing', 'success');
-            enableChat();
-            simulatePartnerJoin();
-            
-            if (window.innerWidth <= 767) {
-                setupPanel.classList.remove('active');
-            }
-        }
-        
-        // Enable chat interface
+        // Enable chat functionality
         function enableChat() {
             messageInput.disabled = false;
             sendButton.disabled = false;
-            chatActive = true;
             
-            chatWithUser.textContent = `Chat with ${currentPartner}`;
-            connectionInfo.textContent = `Room: ${currentRoom} • Connected`;
-            
-            // Update user list
-            document.getElementById('userList').innerHTML = `
-                <div class="user-item">
-                    <span class="status-indicator online"></span>
-                    <span style="font-size: 14px;">You - Connected</span>
-                </div>
-                <div class="user-item">
-                    <span class="status-indicator online"></span>
-                    <span style="font-size: 14px;">${currentPartner} - Online</span>
-                </div>
-            `;
-            
-            // Focus on message input
+            // Focus on input
             setTimeout(() => {
                 messageInput.focus();
-            }, 500);
-            
-            // Show auto connect section
-            document.getElementById('autoConnectSection').style.display = 'block';
+            }, 100);
         }
         
-        // Simulate partner joining
-        function simulatePartnerJoin() {
-            setTimeout(() => {
-                addMessage({
-                    text: `${currentPartner} joined the chat! You can now start messaging.`,
-                    sender: 'System',
-                    time: new Date(),
-                    type: 'received'
-                });
-            }, 1000);
+        // Update status
+        function updateStatus(message, type = 'info') {
+            status.textContent = message;
+            status.style.background = type === 'success' ? '#d4edda' : '#fff3cd';
+            status.style.color = type === 'success' ? '#155724' : '#856404';
         }
         
-        // Send message - REAL FUNCTIONALITY
+        // Add system message
+        function addSystemMessage(text) {
+            const message = {
+                text: text,
+                sender: 'System',
+                time: new Date(),
+                type: 'received'
+            };
+            addMessage(message);
+        }
+        
+        // Send message - MAIN FUNCTION
         function sendMessage() {
+            if (!chatActive) {
+                alert('Please select your role first!');
+                return;
+            }
+            
             const text = messageInput.value.trim();
             
             if (!text) {
-                Swal.fire({
-                    title: 'Empty Message',
-                    text: 'Please type a message first',
-                    icon: 'warning',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#667eea'
-                });
+                alert('Please type a message first!');
+                messageInput.focus();
                 return;
             }
             
-            if (!chatActive) {
-                Swal.fire({
-                    title: 'Not Connected',
-                    text: 'Please connect to a room first',
-                    icon: 'error',
-                    confirmButtonText: 'OK',
-                    confirmButtonColor: '#667eea'
-                });
-                return;
-            }
+            console.log('Sending message:', text); // Debug log
             
-            // Create sent message
-            const message = {
+            // Create and add sent message
+            const sentMessage = {
                 text: text,
                 sender: 'You',
                 time: new Date(),
                 type: 'sent'
             };
-            
-            // Add message to chat
-            addMessage(message);
+            addMessage(sentMessage);
             
             // Clear input
             messageInput.value = '';
@@ -594,60 +286,67 @@
             // Refocus input
             messageInput.focus();
             
-            // Simulate partner reply after 1-3 seconds
+            // Simulate reply after 1-2 seconds
             setTimeout(() => {
-                simulatePartnerReply(text);
-            }, 1000 + Math.random() * 2000);
-            
-            console.log('Message sent:', text); // Debug log
+                simulateReply(text);
+            }, 1000 + Math.random() * 1000);
         }
         
-        // Simulate partner reply
-        function simulatePartnerReply(originalMessage) {
+        // Simulate reply from other person
+        function simulateReply(yourMessage) {
             if (!chatActive) return;
             
-            const replies = [
-                "Hello! Nice to meet you!",
-                "That's interesting! Tell me more.",
-                "I agree with you completely!",
-                "What do you think about this?",
-                "That's a great point!",
-                "I was thinking the same thing!",
-                "How's your day going?",
-                "Thanks for sharing that with me!",
-                "That sounds exciting!",
-                "I'd love to hear more about that!",
-                "That's really helpful, thank you!",
-                "What are your plans for today?",
-                "That's amazing!",
-                "I understand what you mean.",
-                "That's a good question!",
-                "I'm happy to chat with you!"
-            ];
+            const otherPerson = currentUser === 'Person 1' ? 'Person 2' : 'Person 1';
             
-            // Sometimes give contextual replies
+            // Smart replies based on your message
             let reply;
-            if (originalMessage.toLowerCase().includes('hello') || originalMessage.toLowerCase().includes('hi')) {
-                reply = "Hello! How are you doing today?";
-            } else if (originalMessage.toLowerCase().includes('how are you')) {
+            const lowerMessage = yourMessage.toLowerCase();
+            
+            if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
+                reply = "Hello! Nice to meet you! How are you doing?";
+            } else if (lowerMessage.includes('how are you')) {
                 reply = "I'm doing great! Thanks for asking. How about you?";
-            } else if (originalMessage.toLowerCase().includes('thank')) {
+            } else if (lowerMessage.includes('?')) {
+                reply = "That's a good question! Let me think about it...";
+            } else if (lowerMessage.includes('thank')) {
                 reply = "You're welcome! 😊";
-            } else if (originalMessage.toLowerCase().includes('?')) {
-                reply = "That's a good question! Let me think about that...";
+            } else if (lowerMessage.includes('name')) {
+                reply = `I'm ${otherPerson}. Nice to meet you!`;
+            } else if (lowerMessage.includes('weather')) {
+                reply = "The weather is nice today! Perfect for chatting.";
+            } else if (lowerMessage.includes('love') || lowerMessage.includes('like')) {
+                reply = "That's wonderful to hear!";
             } else {
+                // Random friendly replies
+                const replies = [
+                    "That's interesting! Tell me more.",
+                    "I understand what you mean.",
+                    "That sounds great!",
+                    "What do you think about this?",
+                    "I agree with you!",
+                    "That's a good point!",
+                    "Thanks for sharing that!",
+                    "What are your plans for today?",
+                    "That's really helpful!",
+                    "I'm happy we're chatting!",
+                    "That's amazing!",
+                    "How's your day going?",
+                    "That's cool!",
+                    "I'd love to hear more!",
+                    "That's fantastic news!"
+                ];
                 reply = replies[Math.floor(Math.random() * replies.length)];
             }
             
-            const message = {
+            console.log('Simulating reply:', reply); // Debug log
+            
+            const receivedMessage = {
                 text: reply,
-                sender: currentPartner,
+                sender: otherPerson,
                 time: new Date(),
                 type: 'received'
             };
-            
-            addMessage(message);
-            console.log('Partner replied:', reply); // Debug log
+            addMessage(receivedMessage);
         }
         
         // Add message to chat
@@ -669,36 +368,25 @@
             // Scroll to bottom
             setTimeout(() => {
                 chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 100);
+            }, 50);
         }
         
-        // Event Listeners - PROPERLY CONNECTED
+        // Event Listeners - Simple and Clean
         sendButton.addEventListener('click', sendMessage);
         
-        messageInput.addEventListener('keypress', (e) => {
+        messageInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 sendMessage();
             }
         });
         
-        // Auto-focus and scroll when input is focused
-        messageInput.addEventListener('focus', function() {
-            setTimeout(() => {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 300);
-        });
-        
         // Initialize
-        updateStatus('Click "Create Room" or "Join Room" to start', 'info');
+        console.log('Chat app loaded successfully');
         
-        // Show quick connect for testing after 2 seconds
+        // Add welcome message
         setTimeout(() => {
-            document.getElementById('autoConnectSection').style.display = 'block';
-        }, 2000);
-        
-        // Debug info
-        console.log('Chat app initialized successfully');
-        console.log('To test: 1. Click "Create Room" 2. Type message 3. Press Send');
+            addSystemMessage('This is a working chat demo. Click the buttons above to start!');
+        }, 1000);
     </script>
 </body>
 </html>
