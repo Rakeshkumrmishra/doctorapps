@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real Backend Chat</title>
+    <title>Secure Code-Based Chat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * {
             margin: 0;
@@ -14,46 +15,156 @@
         }
         
         body {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 10px;
+            padding: 0;
         }
         
         .container {
             width: 100%;
-            max-width: 400px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            height: 100vh;
+            background-color: white;
+            border-radius: 0;
+            box-shadow: none;
+            display: flex;
             overflow: hidden;
         }
         
-        .chat-header {
+        .sidebar {
+            width: 320px;
+            background-color: #f5f7fb;
+            border-right: 1px solid #e6e6e6;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+        
+        .user-profile {
             padding: 20px;
-            background: #667eea;
-            color: white;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background-color: white;
+            border-bottom: 1px solid #e6e6e6;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #6e8efb;
+        }
+        
+        .user-info h3 {
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .user-info p {
+            font-size: 12px;
+            color: #6e8efb;
+        }
+        
+        .contact-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+        }
+        
+        .contact {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .contact:hover {
+            background-color: #e9edf5;
+        }
+        
+        .contact.active {
+            background-color: #e1e8f7;
+            border-left: 3px solid #6e8efb;
+        }
+        
+        .contact-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .contact-info h4 {
+            font-size: 14px;
+            color: #333;
+        }
+        
+        .contact-info p {
+            font-size: 12px;
+            color: #777;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+        
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        
+        .chat-header {
+            padding: 15px 20px;
+            background-color: white;
+            border-bottom: 1px solid #e6e6e6;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #6e8efb;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .chat-header-info h3 {
+            font-size: 16px;
+            color: #333;
+        }
+        
+        .chat-header-info p {
+            font-size: 12px;
+            color: #6e8efb;
         }
         
         .chat-messages {
-            height: 400px;
+            flex: 1;
             padding: 20px;
             overflow-y: auto;
-            background: #f8f9fa;
+            background-color: #f5f7fb;
             display: flex;
             flex-direction: column;
         }
         
         .message {
-            margin: 10px 0;
-            padding: 12px 16px;
-            border-radius: 18px;
-            max-width: 80%;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: flex-end;
+            max-width: 85%;
             animation: fadeIn 0.3s ease;
-            word-wrap: break-word;
         }
         
         @keyframes fadeIn {
@@ -61,367 +172,854 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        .message.sent {
-            background: #667eea;
-            color: white;
-            margin-left: auto;
-            border-bottom-right-radius: 5px;
+        .message.received {
+            align-self: flex-start;
         }
         
-        .message.received {
-            background: white;
-            border: 1px solid #e9ecef;
+        .message.sent {
+            align-self: flex-end;
+            margin-left: auto;
+            flex-direction: row-reverse;
+        }
+        
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 8px;
+            flex-shrink: 0;
+        }
+        
+        .message-content {
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 100%;
+            word-wrap: break-word;
+            position: relative;
+        }
+        
+        .received .message-content {
+            background-color: white;
             border-bottom-left-radius: 5px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .sent .message-content {
+            background-color: #6e8efb;
+            color: white;
+            border-bottom-right-radius: 5px;
         }
         
         .message-time {
             font-size: 11px;
-            opacity: 0.8;
+            color: #999;
             margin-top: 5px;
             text-align: right;
         }
         
-        .chat-input-container {
-            padding: 20px;
-            background: white;
-            border-top: 1px solid #e9ecef;
-            display: flex;
-            gap: 10px;
-        }
-        
         .chat-input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 1px solid #ddd;
-            border-radius: 25px;
-            font-size: 14px;
-            outline: none;
-        }
-        
-        .send-btn {
-            padding: 12px 20px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            font-weight: 600;
             display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .send-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-        }
-        
-        .connection-panel {
-            padding: 20px;
-            background: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        .btn {
-            width: 100%;
             padding: 15px;
-            margin: 10px 0;
+            background-color: white;
+            border-top: 1px solid #e6e6e6;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 24px;
+            outline: none;
+            font-size: 14px;
+            min-width: 50px;
+        }
+        
+        .chat-input button {
+            margin-left: 10px;
+            padding: 10px 20px;
+            background-color: #6e8efb;
+            color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 24px;
+            cursor: pointer;
             font-weight: 600;
+            transition: background-color 0.2s;
+            white-space: nowrap;
+        }
+        
+        .chat-input button:hover {
+            background-color: #5a7dfa;
+        }
+        
+        .typing-indicator {
+            padding: 5px 15px;
+            font-style: italic;
+            color: #999;
+            font-size: 12px;
+            display: none;
+        }
+        
+        .login-container {
+            width: 100%;
+            max-width: 450px;
+            padding: 30px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        
+        .login-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        .login-container button {
+            width: 100%;
+            padding: 12px;
+            background-color: #6e8efb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            margin-top: 20px;
+        }
+        
+        .login-container button:hover {
+            background-color: #5a7dfa;
+        }
+        
+        .user-codes {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .user-code-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background-color: #f5f7fb;
+            border-radius: 8px;
+            border-left: 4px solid #6e8efb;
+        }
+        
+        .user-code-info {
+            text-align: left;
+        }
+        
+        .user-code-info h4 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .user-code-info p {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .user-code {
+            font-size: 18px;
+            font-weight: bold;
+            color: #6e8efb;
+            background-color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px dashed #6e8efb;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .status-online {
+            background-color: #4CAF50;
+        }
+        
+        .status-offline {
+            background-color: #f44336;
+        }
+        
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        
+        .connection-connected {
+            background-color: #4CAF50;
+            color: white;
+        }
+        
+        .connection-disconnected {
+            background-color: #f44336;
+            color: white;
+        }
+        
+        .back-home-btn {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #6e8efb;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
             cursor: pointer;
             font-size: 14px;
+            z-index: 100;
         }
         
-        .btn-primary {
-            background: #667eea;
-            color: white;
+        /* Mobile Styles */
+        @media (max-width: 900px) {
+            .container {
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .sidebar {
+                position: absolute;
+                left: 0;
+                top: 0;
+                height: 100%;
+                z-index: 10;
+                transform: translateX(-100%);
+                width: 85%;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
         }
         
-        .btn-success {
-            background: #28a745;
-            color: white;
+        @media (max-width: 768px) {
+            .user-profile {
+                padding: 15px;
+            }
+            
+            .user-avatar {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .chat-header {
+                padding: 12px 15px;
+            }
+            
+            .chat-messages {
+                padding: 15px;
+            }
+            
+            .message-content {
+                padding: 8px 12px;
+            }
+            
+            .chat-input {
+                padding: 12px;
+            }
+            
+            .chat-input button {
+                padding: 10px 15px;
+            }
+            
+            .login-container {
+                margin: 20px;
+            }
         }
         
-        .status {
-            padding: 10px;
-            background: #fff3cd;
-            border-radius: 5px;
-            margin: 10px 0;
-            text-align: center;
-            font-size: 14px;
+        @media (max-width: 480px) {
+            body {
+                padding: 0;
+            }
+            
+            .container {
+                height: 100vh;
+            }
+            
+            .login-container {
+                padding: 20px;
+            }
+            
+            .user-code-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .user-code {
+                align-self: flex-end;
+            }
+            
+            .message {
+                max-width: 95%;
+            }
+            
+            .message-avatar {
+                width: 28px;
+                height: 28px;
+            }
+            
+            .chat-input button span {
+                display: none;
+            }
+            
+            .chat-input button {
+                padding: 10px;
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .mobile-menu-btn {
+                font-size: 16px;
+            }
+            
+            .back-home-btn {
+                top: 10px;
+                left: 10px;
+                padding: 6px 12px;
+                font-size: 12px;
+            }
         }
         
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: 2px solid #667eea;
+        @media (min-width: 901px) {
+            .container {
+                height: 90vh;
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                max-width: 1000px;
+            }
+            
+            body {
+                padding: 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="connection-panel">
-            <div class="user-info">
-                <img src="https://i.pravatar.cc/150?img=5" class="user-avatar" id="userAvatar">
-                <div>
-                    <strong id="userName">Choose Your Role</strong>
-                    <div class="status" id="status">Disconnected</div>
+    <!-- Connection Status -->
+    <div id="connectionStatus" class="connection-status connection-disconnected" style="display: none;">
+        Connecting to Firebase...
+    </div>
+
+    <!-- Back to Home Button -->
+    <button id="backHomeBtn" class="back-home-btn" style="display: none;">
+        <i class="fas fa-home"></i> Back Home
+    </button>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <h2>Secure Code-Based Chat</h2>
+        <p style="margin-bottom: 20px; color: #666;">Enter your unique code to access the chat</p>
+        
+        <button onclick="showCodePopup()">
+            <i class="fas fa-key"></i> Enter Access Code
+        </button>
+        
+        <div class="user-codes">
+            <h3 style="margin: 20px 0 10px; color: #333; text-align: left;">Available User Codes:</h3>
+            <div class="user-code-item">
+                <div class="user-code-info">
+                    <h4>Alex Johnson</h4>
+                    <p>Use this code to login as Alex</p>
+                </div>
+                <div class="user-code">ALEX123</div>
+            </div>
+            <div class="user-code-item">
+                <div class="user-code-info">
+                    <h4>Sam Wilson</h4>
+                    <p>Use this code to login as Sam</p>
+                </div>
+                <div class="user-code">SAM456</div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 25px; padding: 15px; background-color: #f9f9f9; border-radius: 8px;">
+            <h4 style="color: #333; margin-bottom: 10px;">How to use:</h4>
+            <ol style="text-align: left; padding-left: 20px; color: #666;">
+                <li>Click "Enter Access Code" button</li>
+                <li>Enter one of the codes above</li>
+                <li>Chat will open automatically</li>
+            </ol>
+        </div>
+    </div>
+    
+    <!-- Chat Interface -->
+    <div id="chatScreen" class="container" style="display: none;">
+        <div class="sidebar" id="sidebar">
+            <div class="user-profile">
+                <img src="https://i.pravatar.cc/150?img=5" alt="User" class="user-avatar" id="currentUserAvatar">
+                <div class="user-info">
+                    <h3 id="currentUserName">Alex Johnson</h3>
+                    <p id="userStatus"><span class="status-indicator status-online"></span>Online</p>
                 </div>
             </div>
             
-            <button class="btn btn-primary" onclick="loginAsPerson1()">
-                <i class="fas fa-user"></i> Login as Person 1 (Alex)
-            </button>
-            <button class="btn btn-success" onclick="loginAsPerson2()">
-                <i class="fas fa-user"></i> Login as Person 2 (Sam)
-            </button>
-        </div>
-        
-        <div class="chat-header">
-            <h3 id="chatTitle">Real Backend Chat</h3>
-            <p id="chatSubtitle">Firebase Real-time Database</p>
-        </div>
-        
-        <div class="chat-messages" id="chatMessages">
-            <div class="message received">
-                <div>Welcome to Real Backend Chat! Login to start real messaging.</div>
-                <div class="message-time">System</div>
+            <div class="contact-list">
+                <div class="contact active">
+                    <img src="https://i.pravatar.cc/150?img=12" alt="Contact" class="contact-avatar">
+                    <div class="contact-info">
+                        <h4 id="contactName">Sam Wilson</h4>
+                        <p id="contactStatus"><span class="status-indicator status-online"></span>Online</p>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <div class="chat-input-container">
-            <input type="text" class="chat-input" id="messageInput" placeholder="Type your message..." disabled>
-            <button class="send-btn" id="sendButton" disabled>
-                <i class="fas fa-paper-plane"></i> Send
-            </button>
+        <div class="chat-area">
+            <div class="chat-header">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <img src="https://i.pravatar.cc/150?img=12" alt="Contact" class="user-avatar">
+                <div class="chat-header-info">
+                    <h3 id="chatContactName">Sam Wilson</h3>
+                    <p id="chatContactStatus"><span class="status-indicator status-online"></span>Online</p>
+                </div>
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will be loaded here from Firebase -->
+                <div class="message received">
+                    <img src="https://i.pravatar.cc/150?img=12" alt="Alex" class="message-avatar">
+                    <div class="message-content">
+                        <p>Welcome to the secure chat! Enter your code to start messaging.</p>
+                        <div class="message-time" id="welcome-time">System</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="typing-indicator" id="typingIndicator">
+                <span id="typingText">Someone is typing...</span>
+            </div>
+            
+            <div class="chat-input">
+                <input type="text" id="messageInput" placeholder="Type a message...">
+                <button id="sendButton">
+                    <i class="fas fa-paper-plane"></i> <span>Send</span>
+                </button>
+            </div>
         </div>
     </div>
 
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    
     <script>
         // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyBnPD7v-8IGqrYepC2RvJDJRS2gFFvl2f8",
             authDomain: "student-database-e3f5c.firebaseapp.com",
-            databaseURL: "https://student-database-e3f5c-default-rtdb.firebaseio.com",
+            databaseURL: "https://student-database-e3f5c.firebaseio.com",
             projectId: "student-database-e3f5c",
             storageBucket: "student-database-e3f5c.firebasestorage.app",
             messagingSenderId: "502335602197",
-            appId: "1:502335602197:web:7eea29a2b2402d98e1d81c"
+            appId: "1:502335602197:web:7eea29a2b2402d98e1d81c",
+            measurementId: "G-DD9RHLS83Z"
         };
-
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
-
-        // Chat Variables
-        let currentUser = null;
-        let chatActive = false;
-        let messagesRef = null;
-
+        
+        // User codes and details
+        const userCodes = {
+            "ALEX123": {
+                name: "Alex Johnson",
+                avatar: "https://i.pravatar.cc/150?img=5",
+                id: "user1"
+            },
+            "SAM456": {
+                name: "Sam Wilson", 
+                avatar: "https://i.pravatar.cc/150?img=12",
+                id: "user2"
+            }
+        };
+        
+        // App State
+        let currentUser = '';
+        let currentUserId = '';
+        let unsubscribeMessages = null;
+        let firebaseInitialized = false;
+        let db = null;
+        
         // DOM Elements
+        const loginScreen = document.getElementById('loginScreen');
+        const chatScreen = document.getElementById('chatScreen');
         const chatMessages = document.getElementById('chatMessages');
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
-        const status = document.getElementById('status');
-        const chatTitle = document.getElementById('chatTitle');
-        const chatSubtitle = document.getElementById('chatSubtitle');
-        const userName = document.getElementById('userName');
-        const userAvatar = document.getElementById('userAvatar');
-
-        // Login as Person 1
-        function loginAsPerson1() {
-            currentUser = {
-                id: 'person1',
-                name: 'Alex Johnson',
-                avatar: 'https://i.pravatar.cc/150?img=5'
-            };
-            initializeChat();
-        }
-
-        // Login as Person 2
-        function loginAsPerson2() {
-            currentUser = {
-                id: 'person2', 
-                name: 'Sam Wilson',
-                avatar: 'https://i.pravatar.cc/150?img=12'
-            };
-            initializeChat();
-        }
-
-        // Initialize Chat with Firebase
-        function initializeChat() {
-            if (!currentUser) return;
-
-            chatActive = true;
-            messagesRef = database.ref('chat/messages');
-
-            // Update UI
-            enableChat();
-            updateStatus('Connected to Firebase - Real-time chat active', 'success');
-            userName.textContent = currentUser.name;
-            userAvatar.src = currentUser.avatar;
-            chatTitle.textContent = `Chat - ${currentUser.name}`;
-            chatSubtitle.textContent = 'Real-time Firebase Database';
-
-            // Clear existing messages
-            chatMessages.innerHTML = '';
-
-            // Load existing messages from Firebase
-            loadMessages();
-
-            // Listen for new messages
-            setupMessageListener();
-
-            addSystemMessage(`You are logged in as ${currentUser.name}. Start real-time chatting!`);
-        }
-
-        // Load messages from Firebase
-        function loadMessages() {
-            messagesRef.orderByChild('timestamp').once('value')
-                .then((snapshot) => {
-                    snapshot.forEach((childSnapshot) => {
-                        const message = childSnapshot.val();
-                        displayMessage(message);
-                    });
-                    scrollToBottom();
-                })
-                .catch((error) => {
-                    console.error('Error loading messages:', error);
-                    addSystemMessage('Error loading messages. Using demo mode.');
-                });
-        }
-
-        // Setup real-time message listener
-        function setupMessageListener() {
-            messagesRef.orderByChild('timestamp').on('child_added', (snapshot) => {
-                const message = snapshot.val();
-                // Only display if not sent by current user (to avoid duplicates)
-                if (message.senderId !== currentUser.id) {
-                    displayMessage(message);
+        const typingIndicator = document.getElementById('typingIndicator');
+        const currentUserName = document.getElementById('currentUserName');
+        const currentUserAvatar = document.getElementById('currentUserAvatar');
+        const contactName = document.getElementById('contactName');
+        const chatContactName = document.getElementById('chatContactName');
+        const sidebar = document.getElementById('sidebar');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const connectionStatus = document.getElementById('connectionStatus');
+        const backHomeBtn = document.getElementById('backHomeBtn');
+        
+        // Show code input popup
+        function showCodePopup() {
+            Swal.fire({
+                title: 'Enter Access Code',
+                input: 'text',
+                inputPlaceholder: 'Enter your code here...',
+                inputAttributes: {
+                    autocapitalize: 'off',
+                    autocorrect: 'off',
+                    maxlength: 10
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Access Chat',
+                cancelButtonText: 'Cancel',
+                confirmButtonColor: '#6e8efb',
+                backdrop: true,
+                allowOutsideClick: false,
+                preConfirm: (code) => {
+                    if (!code) {
+                        Swal.showValidationMessage('Please enter a code');
+                        return false;
+                    }
+                    
+                    const userCode = code.toUpperCase().trim();
+                    if (!userCodes[userCode]) {
+                        Swal.showValidationMessage('Invalid code. Please try again.');
+                        return false;
+                    }
+                    
+                    return userCode;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const userCode = result.value;
+                    loginWithCode(userCode);
                 }
             });
         }
-
-        // Enable chat functionality
-        function enableChat() {
-            messageInput.disabled = false;
-            sendButton.disabled = false;
+        
+        // Login with code
+        function loginWithCode(code) {
+            const userData = userCodes[code];
             
-            setTimeout(() => {
-                messageInput.focus();
-            }, 100);
-        }
-
-        // Update status
-        function updateStatus(message, type = 'info') {
-            status.textContent = message;
-            status.style.background = type === 'success' ? '#d4edda' : '#fff3cd';
-            status.style.color = type === 'success' ? '#155724' : '#856404';
-            status.style.border = type === 'success' ? '1px solid #c3e6cb' : '1px solid #ffeaa7';
-        }
-
-        // Add system message
-        function addSystemMessage(text) {
-            const message = {
-                text: text,
-                sender: 'System',
-                timestamp: Date.now(),
-                type: 'received'
-            };
-            displayMessage(message);
-        }
-
-        // Send message to Firebase
-        function sendMessage() {
-            if (!chatActive || !currentUser) {
-                alert('Please login first!');
+            if (!userData) {
+                Swal.fire({
+                    title: 'Invalid Code',
+                    text: 'The code you entered is not valid. Please try again.',
+                    icon: 'error',
+                    confirmButtonText: 'Try Again',
+                    confirmButtonColor: '#6e8efb'
+                }).then(() => {
+                    showCodePopup();
+                });
                 return;
             }
-
-            const text = messageInput.value.trim();
             
-            if (!text) {
-                alert('Please type a message first!');
-                messageInput.focus();
+            currentUser = userData.name;
+            currentUserId = userData.id;
+            
+            // Set user info in UI
+            currentUserName.textContent = currentUser;
+            const otherUser = currentUser === "Alex Johnson" ? "Sam Wilson" : "Alex Johnson";
+            contactName.textContent = otherUser;
+            chatContactName.textContent = otherUser;
+            
+            // Set avatars
+            currentUserAvatar.src = userData.avatar;
+            
+            // Show chat interface
+            loginScreen.style.display = 'none';
+            chatScreen.style.display = 'flex';
+            backHomeBtn.style.display = 'block';
+            
+            // Initialize Firebase if not already done
+            if (!firebaseInitialized) {
+                initializeFirebase();
+            }
+            
+            // Load messages
+            loadMessages();
+            
+            // Set up real-time listener for new messages
+            setupMessageListener();
+            
+            // Show success message
+            Swal.fire({
+                title: 'Access Granted!',
+                text: `Welcome ${currentUser}!`,
+                icon: 'success',
+                confirmButtonText: 'Start Chatting',
+                confirmButtonColor: '#6e8efb',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+        
+        // Show back home confirmation
+        function showBackHomeConfirmation() {
+            Swal.fire({
+                title: 'Leave Chat?',
+                text: 'Are you sure you want to go back to the home screen?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, Go Home',
+                cancelButtonText: 'Stay in Chat',
+                confirmButtonColor: '#6e8efb',
+                backdrop: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    goBackHome();
+                }
+            });
+        }
+        
+        // Go back to home screen
+        function goBackHome() {
+            if (unsubscribeMessages) {
+                unsubscribeMessages();
+            }
+            
+            chatScreen.style.display = 'none';
+            loginScreen.style.display = 'block';
+            backHomeBtn.style.display = 'none';
+            
+            // Reset state
+            currentUser = '';
+            currentUserId = '';
+        }
+        
+        // Initialize Firebase with error handling
+        function initializeFirebase() {
+            try {
+                // Initialize Firebase
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.firestore();
+                
+                // Enable offline persistence
+                db.enablePersistence()
+                    .then(() => {
+                        console.log("Firebase persistence enabled");
+                    })
+                    .catch((err) => {
+                        console.log("Persistence failed: ", err);
+                    });
+                
+                // Monitor connection state
+                firebase.firestore().enableNetwork()
+                    .then(() => {
+                        console.log("Firebase connected");
+                        updateConnectionStatus(true);
+                    })
+                    .catch((error) => {
+                        console.error("Firebase connection error: ", error);
+                        updateConnectionStatus(false);
+                    });
+                
+                firebaseInitialized = true;
+                console.log("Firebase initialized successfully");
+                
+            } catch (error) {
+                console.error("Firebase initialization error: ", error);
+                updateConnectionStatus(false);
+                showError("Firebase initialization failed. Using demo mode.");
+                // Continue in demo mode
+                firebaseInitialized = false;
+            }
+        }
+        
+        // Update connection status display
+        function updateConnectionStatus(connected) {
+            connectionStatus.style.display = 'block';
+            if (connected) {
+                connectionStatus.textContent = 'Connected to Firebase';
+                connectionStatus.className = 'connection-status connection-connected';
+            } else {
+                connectionStatus.textContent = 'Disconnected - Using Demo Mode';
+                connectionStatus.className = 'connection-status connection-disconnected';
+            }
+        }
+        
+        // Show error message
+        function showError(message) {
+            Swal.fire({
+                title: 'Error',
+                text: message,
+                icon: 'error',
+                confirmButtonText: 'OK',
+                confirmButtonColor: '#6e8efb'
+            });
+        }
+        
+        // Load messages from Firestore
+        function loadMessages() {
+            if (!firebaseInitialized || !db) {
+                console.log("Firebase not available, using demo mode");
+                showDemoMessage();
                 return;
             }
-
-            // Create message object
-            const message = {
-                text: text,
-                sender: currentUser.name,
-                senderId: currentUser.id,
-                timestamp: Date.now(),
-                type: 'sent'
-            };
-
-            // Display message immediately
-            displayMessage(message);
-
-            // Clear input
-            messageInput.value = '';
-            messageInput.focus();
-
-            // Save to Firebase
-            saveMessageToFirebase(message);
-        }
-
-        // Save message to Firebase
-        function saveMessageToFirebase(message) {
-            const newMessageRef = messagesRef.push();
-            newMessageRef.set(message)
-                .then(() => {
-                    console.log('Message saved to Firebase');
+            
+            // Clear existing messages except the welcome message
+            const welcomeMsg = document.querySelector('.message.received');
+            chatMessages.innerHTML = '';
+            if (welcomeMsg) {
+                chatMessages.appendChild(welcomeMsg);
+            }
+            
+            // Fetch messages from Firestore
+            db.collection('messages')
+                .orderBy('timestamp', 'asc')
+                .get()
+                .then((querySnapshot) => {
+                    querySnapshot.forEach((doc) => {
+                        const message = doc.data();
+                        displayMessage(message, false);
+                    });
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
                 })
                 .catch((error) => {
-                    console.error('Error saving message:', error);
-                    addSystemMessage('Error sending message. Please try again.');
+                    console.error("Error loading messages: ", error);
+                    showDemoMessage();
                 });
         }
-
-        // Display message in chat
-        function displayMessage(message) {
-            // Check if message is from current user
-            const isSent = message.senderId === currentUser?.id;
-            
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
-            
-            const date = new Date(message.timestamp);
-            const timeString = date.toLocaleTimeString([], { 
-                hour: '2-digit', minute: '2-digit' 
-            });
-
-            messageDiv.innerHTML = `
-                <div>${message.text}</div>
-                <div class="message-time">${message.sender} • ${timeString}</div>
+        
+        // Show demo message when Firebase fails
+        function showDemoMessage() {
+            const demoMsg = document.createElement('div');
+            demoMsg.className = 'message received';
+            demoMsg.innerHTML = `
+                <img src="https://i.pravatar.cc/150?img=12" alt="System" class="message-avatar">
+                <div class="message-content">
+                    <p><strong>Demo Mode:</strong> Firebase connection failed. Messages won't be saved.</p>
+                    <div class="message-time">System</div>
+                </div>
             `;
-
+            chatMessages.appendChild(demoMsg);
+        }
+        
+        // Set up real-time listener for new messages
+        function setupMessageListener() {
+            if (!firebaseInitialized || !db) return;
+            
+            unsubscribeMessages = db.collection('messages')
+                .orderBy('timestamp', 'asc')
+                .onSnapshot((querySnapshot) => {
+                    querySnapshot.docChanges().forEach((change) => {
+                        if (change.type === "added") {
+                            const message = change.doc.data();
+                            if (message.senderId !== currentUserId) {
+                                displayMessage(message, true);
+                            }
+                        }
+                    });
+                }, (error) => {
+                    console.error("Message listener error: ", error);
+                });
+        }
+        
+        // Send message function
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+            
+            if (!messageText) return;
+            
+            // Create message object
+            const message = {
+                text: messageText,
+                sender: currentUser,
+                senderId: currentUserId,
+                timestamp: new Date()
+            };
+            
+            // Display message immediately for better UX
+            displayMessage(message, true);
+            messageInput.value = '';
+            
+            // Try to save to Firebase if available
+            if (firebaseInitialized && db) {
+                message.timestamp = firebase.firestore.FieldValue.serverTimestamp();
+                
+                db.collection('messages').add(message)
+                    .then(() => {
+                        console.log("Message saved to Firebase");
+                    })
+                    .catch((error) => {
+                        console.error("Error saving message to Firebase: ", error);
+                        showError("Message saved locally (Firebase error)");
+                    });
+            } else {
+                showError("Message saved locally (Demo mode)");
+            }
+        }
+        
+        // Display message in chat
+        function displayMessage(message, animate = true) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${message.senderId === currentUserId ? 'sent' : 'received'}`;
+            
+            if (animate) {
+                messageDiv.style.animation = 'fadeIn 0.3s ease';
+            }
+            
+            const avatarSrc = message.senderId === currentUserId 
+                ? (currentUser === 'Alex Johnson' ? 'https://i.pravatar.cc/150?img=5' : 'https://i.pravatar.cc/150?img=12')
+                : (currentUser === 'Alex Johnson' ? 'https://i.pravatar.cc/150?img=12' : 'https://i.pravatar.cc/150?img=5');
+            
+            // Format timestamp
+            let timeString = 'Just now';
+            if (message.timestamp) {
+                if (message.timestamp.toDate) {
+                    const date = message.timestamp.toDate();
+                    timeString = date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                } else if (message.timestamp instanceof Date) {
+                    timeString = message.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                }
+            }
+            
+            messageDiv.innerHTML = `
+                <img src="${avatarSrc}" alt="${message.sender}" class="message-avatar">
+                <div class="message-content">
+                    <p>${message.text}</p>
+                    <div class="message-time">${timeString}</div>
+                </div>
+            `;
+            
             chatMessages.appendChild(messageDiv);
-            scrollToBottom();
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
-
-        // Scroll to bottom of chat
-        function scrollToBottom() {
-            setTimeout(() => {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 100);
-        }
-
+        
+        // Mobile menu toggle
+        mobileMenuBtn.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+        });
+        
+        // Close sidebar when clicking on a message on mobile
+        chatMessages.addEventListener('click', function() {
+            if (window.innerWidth <= 900) {
+                sidebar.classList.remove('active');
+            }
+        });
+        
         // Event Listeners
         sendButton.addEventListener('click', sendMessage);
         
@@ -430,15 +1028,32 @@
                 sendMessage();
             }
         });
-
-        // Initialize
-        console.log('Real Backend Chat loaded with Firebase');
-        updateStatus('Please login to start real-time chat');
-
-        // Add welcome message
+        
+        // Back home button
+        backHomeBtn.addEventListener('click', showBackHomeConfirmation);
+        
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 900) {
+                sidebar.classList.remove('active');
+            }
+        });
+        
+        // Handle page unload
+        window.addEventListener('beforeunload', function() {
+            if (unsubscribeMessages) {
+                unsubscribeMessages();
+            }
+        });
+        
+        // Initialize Firebase
+        initializeFirebase();
+        
+        // Auto-show code popup after a short delay
         setTimeout(() => {
-            addSystemMessage('This chat uses Firebase Real-time Database. Messages are stored in cloud and sync between users.');
-        }, 1000);
+            // Uncomment the line below if you want the code popup to appear automatically
+            // showCodePopup();
+        }, 500);
     </script>
 </body>
 </html>
