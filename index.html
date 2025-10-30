@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Chat - Auto Room System</title>
+    <title>Mobile Friendly Chat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -20,180 +20,188 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            padding: 0;
         }
         
         .container {
             width: 100%;
-            max-width: 1000px;
-            height: 90vh;
+            height: 100vh;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-            display: flex;
-        }
-        
-        .setup-panel {
-            width: 350px;
-            background: #f8f9fa;
-            padding: 30px;
-            border-right: 1px solid #e9ecef;
             display: flex;
             flex-direction: column;
+            overflow: hidden;
+        }
+        
+        /* Mobile First Design */
+        .setup-panel {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: none; /* Hidden by default on mobile */
+        }
+        
+        .setup-panel.active {
+            display: block;
         }
         
         .chat-area {
             flex: 1;
             display: flex;
             flex-direction: column;
+            height: 100%;
         }
         
         .chat-header {
-            padding: 20px;
+            padding: 15px 20px;
             background: #667eea;
             color: white;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
+            position: relative;
+        }
+        
+        .mobile-menu-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 5px;
         }
         
         .user-avatar {
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            border: 3px solid white;
+            border: 2px solid white;
         }
         
+        .header-info {
+            flex: 1;
+        }
+        
+        .header-info h3 {
+            font-size: 16px;
+            margin-bottom: 2px;
+        }
+        
+        .header-info p {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        
+        /* Chat Messages - Mobile Optimized */
         .chat-messages {
             flex: 1;
-            padding: 25px;
+            padding: 15px;
             overflow-y: auto;
             background: #f8f9fa;
             display: flex;
             flex-direction: column;
+            min-height: 0; /* Important for mobile */
         }
         
         .message {
-            margin: 12px 0;
-            padding: 15px 20px;
-            border-radius: 25px;
-            max-width: 75%;
+            margin: 8px 0;
+            padding: 12px 15px;
+            border-radius: 18px;
+            max-width: 85%;
             animation: fadeIn 0.3s ease;
+            word-wrap: break-word;
+            position: relative;
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { 
+                opacity: 0; 
+                transform: translateY(10px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
         }
         
         .message.sent {
             background: #667eea;
             color: white;
             margin-left: auto;
-            border-bottom-right-radius: 8px;
+            border-bottom-right-radius: 5px;
         }
         
         .message.received {
             background: white;
             border: 1px solid #e9ecef;
-            border-bottom-left-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
         .message-time {
-            font-size: 11px;
+            font-size: 10px;
             opacity: 0.8;
-            margin-top: 5px;
+            margin-top: 4px;
             text-align: right;
         }
         
         .chat-input {
-            padding: 20px;
+            padding: 15px;
             background: white;
             border-top: 1px solid #e9ecef;
             display: flex;
-            gap: 12px;
+            gap: 10px;
+            align-items: center;
         }
         
         .chat-input input {
             flex: 1;
-            padding: 15px 20px;
+            padding: 12px 15px;
             border: 1px solid #ddd;
-            border-radius: 25px;
+            border-radius: 20px;
             font-size: 14px;
             outline: none;
+            min-height: 44px; /* Better touch target */
         }
         
         .chat-input button {
-            padding: 15px 25px;
+            padding: 12px 20px;
             background: #667eea;
             color: white;
             border: none;
-            border-radius: 25px;
+            border-radius: 20px;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.3s;
-        }
-        
-        .chat-input button:hover {
-            background: #5a6fd8;
-            transform: translateY(-2px);
-        }
-        
-        .connection-status {
-            padding: 15px;
-            background: #fff3cd;
-            border-left: 4px solid #ffc107;
-            margin-bottom: 20px;
-            border-radius: 8px;
-        }
-        
-        .user-list {
-            margin-top: 20px;
-        }
-        
-        .user-item {
-            padding: 15px;
-            background: white;
-            border-radius: 10px;
-            margin-bottom: 10px;
+            min-height: 44px; /* Better touch target */
             display: flex;
             align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
+            gap: 5px;
         }
         
-        .user-item:hover {
-            border-color: #667eea;
+        .chat-input button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
         }
         
-        .user-item.active {
-            border-color: #667eea;
-            background: #f0f4ff;
+        /* Connection Status */
+        .connection-status {
+            padding: 12px 15px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-size: 14px;
         }
         
-        .status-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-        }
-        
-        .online { background: #28a745; }
-        .offline { background: #dc3545; }
-        .connecting { background: #ffc107; }
-        
+        /* Action Buttons */
         .action-btn {
             width: 100%;
             padding: 15px;
-            margin: 10px 0;
+            margin: 8px 0;
             border: none;
             border-radius: 10px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
+            font-size: 14px;
         }
         
         .btn-primary {
@@ -206,81 +214,169 @@
             color: white;
         }
         
-        .btn-warning {
-            background: #ffc107;
-            color: black;
-        }
-        
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        /* Auto Connect Section */
+        .auto-connect-section {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid #28a745;
         }
         
         .code-display {
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
             text-align: center;
             border: 2px dashed #667eea;
         }
         
         .room-code {
-            font-size: 28px;
+            font-size: 22px;
             font-weight: bold;
             color: #667eea;
-            letter-spacing: 3px;
-            margin: 15px 0;
+            letter-spacing: 2px;
+            margin: 10px 0;
             font-family: monospace;
         }
         
-        .auto-connect-section {
-            background: #e8f5e8;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            border-left: 4px solid #28a745;
+        /* User List */
+        .user-list {
+            margin-top: 15px;
         }
         
-        .saved-rooms {
-            margin-top: 20px;
-        }
-        
-        .saved-room-item {
+        .user-item {
+            padding: 12px;
             background: white;
-            padding: 15px;
             border-radius: 8px;
-            margin: 10px 0;
+            margin-bottom: 8px;
             display: flex;
-            justify-content: between;
             align-items: center;
-            cursor: pointer;
+            gap: 10px;
         }
         
-        @media (max-width: 768px) {
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .online { background: #28a745; }
+        .offline { background: #dc3545; }
+        .connecting { background: #ffc107; }
+        
+        /* Desktop Styles */
+        @media (min-width: 768px) {
             .container {
-                flex-direction: column;
-                height: 95vh;
+                flex-direction: row;
+                height: 90vh;
+                max-width: 1000px;
+                border-radius: 15px;
+                box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             }
             
             .setup-panel {
-                width: 100%;
-                height: auto;
-                border-right: none;
-                border-bottom: 1px solid #e9ecef;
+                width: 300px;
+                display: flex;
+                flex-direction: column;
+                border-right: 1px solid #e9ecef;
+                border-bottom: none;
+                padding: 25px;
+            }
+            
+            .mobile-menu-btn {
+                display: none;
             }
             
             .message {
-                max-width: 85%;
+                max-width: 70%;
+                padding: 15px 20px;
             }
+            
+            .chat-header {
+                padding: 20px;
+            }
+            
+            .user-avatar {
+                width: 45px;
+                height: 45px;
+            }
+        }
+        
+        /* Large Mobile */
+        @media (max-width: 767px) and (min-width: 480px) {
+            .message {
+                max-width: 80%;
+            }
+            
+            .chat-messages {
+                padding: 20px;
+            }
+        }
+        
+        /* Small Mobile */
+        @media (max-width: 479px) {
+            .message {
+                max-width: 90%;
+                padding: 10px 12px;
+            }
+            
+            .chat-messages {
+                padding: 12px;
+            }
+            
+            .chat-input {
+                padding: 12px;
+            }
+            
+            .chat-input button span {
+                display: none;
+            }
+            
+            .chat-input button {
+                padding: 12px;
+                width: 44px;
+                justify-content: center;
+            }
+        }
+        
+        /* Very Small Screens */
+        @media (max-width: 360px) {
+            .message {
+                max-width: 95%;
+                font-size: 14px;
+            }
+            
+            .chat-header {
+                padding: 12px 15px;
+            }
+            
+            .header-info h3 {
+                font-size: 15px;
+            }
+        }
+        
+        /* Ensure messages are visible */
+        .chat-messages::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 2px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Setup Panel -->
-        <div class="setup-panel">
-            <h2 style="margin-bottom: 20px; color: #333; text-align: center;">
+        <!-- Setup Panel (Hidden on mobile by default) -->
+        <div class="setup-panel" id="setupPanel">
+            <h2 style="margin-bottom: 15px; color: #333; text-align: center; font-size: 18px;">
                 <i class="fas fa-comments"></i> Smart Chat
             </h2>
             
@@ -291,64 +387,52 @@
             
             <!-- Auto Connect Section -->
             <div class="auto-connect-section" id="autoConnectSection" style="display: none;">
-                <h4 style="color: #28a745; margin-bottom: 10px;">
-                    <i class="fas fa-bolt"></i> Auto Connect Available
+                <h4 style="color: #28a745; margin-bottom: 8px; font-size: 14px;">
+                    <i class="fas fa-bolt"></i> Auto Connect
                 </h4>
-                <p style="font-size: 14px; color: #666; margin-bottom: 15px;">
-                    Your previous chat partner is available. Click below to reconnect instantly.
+                <p style="font-size: 12px; color: #666; margin-bottom: 12px;">
+                    Connect instantly with saved partner
                 </p>
                 <button class="action-btn btn-success" onclick="autoReconnect()">
                     <i class="fas fa-plug"></i> Auto Reconnect
                 </button>
             </div>
             
-            <!-- Manual Connection Options -->
+            <!-- Manual Connection -->
             <div id="manualConnection">
                 <button class="action-btn btn-primary" onclick="createRoom()">
                     <i class="fas fa-plus"></i> Create New Room
                 </button>
                 
                 <div class="code-display" id="roomCodeDisplay" style="display: none;">
-                    <p style="font-weight: 600;">Share this code with your partner:</p>
+                    <p style="font-weight: 600; font-size: 14px;">Share this code:</p>
                     <div class="room-code" id="roomCode">ABCD123</div>
-                    <p style="font-size: 12px; color: #666;">
-                        <i class="fas fa-info-circle"></i> This code will be saved for future use
-                    </p>
                 </div>
                 
-                <div style="text-align: center; margin: 20px 0; color: #666; font-weight: 600;">OR</div>
+                <div style="text-align: center; margin: 15px 0; color: #666; font-size: 14px;">OR</div>
                 
-                <input type="text" id="joinCodeInput" placeholder="Enter partner's code..." 
-                       style="width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 10px; margin-bottom: 15px;">
+                <input type="text" id="joinCodeInput" placeholder="Enter partner code..." 
+                       style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 12px; font-size: 14px;">
                 
                 <button class="action-btn btn-success" onclick="joinRoom()">
-                    <i class="fas fa-sign-in-alt"></i> Join Partner
+                    <i class="fas fa-sign-in-alt"></i> Join Room
                 </button>
             </div>
             
-            <!-- Saved Rooms -->
-            <div class="saved-rooms" id="savedRoomsSection" style="display: none;">
-                <h4 style="margin: 25px 0 15px; color: #333;">
-                    <i class="fas fa-history"></i> Saved Connections
-                </h4>
-                <div id="savedRoomsList">
-                    <!-- Saved rooms will appear here -->
-                </div>
-            </div>
-            
+            <!-- User List -->
             <div class="user-list">
-                <h4 style="margin: 25px 0 15px; color: #333;">
-                    <i class="fas fa-users"></i> Connection Status
+                <h4 style="margin: 20px 0 12px; color: #333; font-size: 14px;">
+                    <i class="fas fa-users"></i> Status
                 </h4>
                 <div id="userList">
                     <div class="user-item">
                         <span class="status-indicator offline"></span>
-                        <span>Not connected</span>
+                        <span style="font-size: 14px;">Not connected</span>
                     </div>
                 </div>
             </div>
             
-            <button class="action-btn btn-warning" onclick="resetAllConnections()" style="margin-top: auto;">
+            <button class="action-btn" onclick="resetAllConnections()" style="background: #6c757d; color: white; margin-top: auto;">
                 <i class="fas fa-redo"></i> Reset All
             </button>
         </div>
@@ -356,147 +440,95 @@
         <!-- Chat Area -->
         <div class="chat-area">
             <div class="chat-header">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <img src="https://i.pravatar.cc/150?img=5" class="user-avatar" id="headerAvatar">
-                <div>
-                    <h3 id="chatWithUser">Smart Chat App</h3>
-                    <p id="connectionInfo">Auto-reconnect enabled. No codes needed after first setup.</p>
+                <div class="header-info">
+                    <h3 id="chatWithUser">Smart Chat</h3>
+                    <p id="connectionInfo">Create or join a room</p>
                 </div>
             </div>
             
+            <!-- Chat Messages - This is the main area that should display properly -->
             <div class="chat-messages" id="chatMessages">
                 <div class="message received">
-                    <div>Welcome to Smart Chat! Once you connect with someone, you won't need codes again.</div>
+                    <div>Welcome! Messages will appear here. On mobile, make sure this area is visible and scrollable.</div>
                     <div class="message-time">System</div>
+                </div>
+                <div class="message sent">
+                    <div>This is a sent message example</div>
+                    <div class="message-time">You • 10:30 AM</div>
+                </div>
+                <div class="message received">
+                    <div>This is a received message example</div>
+                    <div class="message-time">Partner • 10:31 AM</div>
                 </div>
             </div>
             
             <div class="chat-input">
                 <input type="text" id="messageInput" placeholder="Type a message..." disabled>
                 <button id="sendButton" disabled>
-                    <i class="fas fa-paper-plane"></i> Send
+                    <i class="fas fa-paper-plane"></i> <span>Send</span>
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        // Smart Room Management System
+        // Mobile responsive chat functionality
         let currentRoom = null;
         let currentPartner = null;
         let isInitiator = false;
-        let savedConnections = JSON.parse(localStorage.getItem('savedConnections')) || [];
         
         // DOM Elements
-        const connectionStatus = document.getElementById('connectionStatus');
-        const statusText = document.getElementById('statusText');
-        const roomCodeDisplay = document.getElementById('roomCodeDisplay');
-        const roomCodeElement = document.getElementById('roomCode');
-        const joinCodeInput = document.getElementById('joinCodeInput');
-        const userList = document.getElementById('userList');
+        const setupPanel = document.getElementById('setupPanel');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const chatMessages = document.getElementById('chatMessages');
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
         const chatWithUser = document.getElementById('chatWithUser');
         const connectionInfo = document.getElementById('connectionInfo');
-        const headerAvatar = document.getElementById('headerAvatar');
-        const autoConnectSection = document.getElementById('autoConnectSection');
-        const manualConnection = document.getElementById('manualConnection');
-        const savedRoomsSection = document.getElementById('savedRoomsSection');
-        const savedRoomsList = document.getElementById('savedRoomsList');
         
-        // Initialize the app
-        function initializeApp() {
-            checkSavedConnections();
-            updateStatus('Smart Chat Ready - Auto-reconnect enabled', 'info');
-        }
+        // Mobile menu toggle
+        mobileMenuBtn.addEventListener('click', function() {
+            setupPanel.classList.toggle('active');
+        });
         
-        // Check for saved connections on app start
-        function checkSavedConnections() {
-            if (savedConnections.length > 0) {
-                autoConnectSection.style.display = 'block';
-                savedRoomsSection.style.display = 'block';
-                updateSavedRoomsList();
+        // Close setup panel when clicking on chat area (mobile)
+        chatMessages.addEventListener('click', function() {
+            if (window.innerWidth <= 767) {
+                setupPanel.classList.remove('active');
             }
-        }
-        
-        // Update saved rooms list
-        function updateSavedRoomsList() {
-            savedRoomsList.innerHTML = '';
-            savedConnections.forEach((conn, index) => {
-                const roomItem = document.createElement('div');
-                roomItem.className = 'saved-room-item';
-                roomItem.innerHTML = `
-                    <div>
-                        <strong>${conn.partnerName}</strong>
-                        <div style="font-size: 12px; color: #666;">Room: ${conn.roomCode}</div>
-                    </div>
-                    <button onclick="connectToSavedRoom(${index})" style="background: #667eea; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer;">
-                        Connect
-                    </button>
-                `;
-                savedRoomsList.appendChild(roomItem);
-            });
-        }
-        
-        // Auto reconnect to last partner
-        function autoReconnect() {
-            if (savedConnections.length > 0) {
-                const lastConnection = savedConnections[savedConnections.length - 1];
-                connectToRoom(lastConnection.roomCode, lastConnection.partnerName, false);
-            }
-        }
-        
-        // Connect to saved room
-        function connectToSavedRoom(index) {
-            const connection = savedConnections[index];
-            connectToRoom(connection.roomCode, connection.partnerName, connection.wasInitiator);
-        }
+        });
         
         // Generate random room code
         function generateRoomCode() {
             return Math.random().toString(36).substring(2, 8).toUpperCase();
         }
         
-        // Update connection status
-        function updateStatus(status, type = 'info') {
-            statusText.textContent = status;
-            const types = {
-                'info': '#fff3cd',
-                'success': '#d1ecf1',
-                'error': '#f8d7da',
-                'warning': '#fff3cd'
-            };
-            const borders = {
-                'info': '#ffc107',
-                'success': '#0c5460',
-                'error': '#721c24',
-                'warning': '#856404'
-            };
-            connectionStatus.style.background = types[type];
-            connectionStatus.style.borderLeftColor = borders[type];
-        }
-        
         // Create new room
         function createRoom() {
             currentRoom = generateRoomCode();
             isInitiator = true;
-            currentPartner = "Alex Johnson"; // Default partner name
+            currentPartner = "Alex Johnson";
             
-            roomCodeElement.textContent = currentRoom;
-            roomCodeDisplay.style.display = 'block';
+            document.getElementById('roomCode').textContent = currentRoom;
+            document.getElementById('roomCodeDisplay').style.display = 'block';
             updateStatus(`Room created: ${currentRoom}`, 'success');
             
-            // Save this connection
-            saveConnection(currentRoom, currentPartner, true);
-            
-            // Enable chat
             enableChat();
             simulateConnection();
+            
+            // Hide setup panel on mobile after connection
+            if (window.innerWidth <= 767) {
+                setupPanel.classList.remove('active');
+            }
         }
         
         // Join existing room
         function joinRoom() {
-            const code = joinCodeInput.value.trim().toUpperCase();
+            const code = document.getElementById('joinCodeInput').value.trim().toUpperCase();
             if (!code) {
                 updateStatus('Please enter a room code', 'error');
                 return;
@@ -504,51 +536,30 @@
             
             currentRoom = code;
             isInitiator = false;
-            currentPartner = "Sam Wilson"; // Default partner name
+            currentPartner = "Sam Wilson";
             
             updateStatus(`Joined room: ${currentRoom}`, 'success');
-            
-            // Save this connection
-            saveConnection(currentRoom, currentPartner, false);
-            
-            // Enable chat
             enableChat();
             simulateConnection();
+            
+            // Hide setup panel on mobile after connection
+            if (window.innerWidth <= 767) {
+                setupPanel.classList.remove('active');
+            }
         }
         
-        // Connect to room (generic function)
-        function connectToRoom(roomCode, partnerName, wasInitiator) {
-            currentRoom = roomCode;
-            isInitiator = wasInitiator;
-            currentPartner = partnerName;
-            
-            updateStatus(`Auto-connected to ${partnerName}`, 'success');
+        // Auto reconnect
+        function autoReconnect() {
+            // Simulate auto reconnect
+            currentRoom = "AUTO123";
+            currentPartner = "Saved Partner";
+            updateStatus('Auto-connected!', 'success');
             enableChat();
             simulateConnection();
-        }
-        
-        // Save connection for future use
-        function saveConnection(roomCode, partnerName, wasInitiator) {
-            const newConnection = {
-                roomCode: roomCode,
-                partnerName: partnerName,
-                wasInitiator: wasInitiator,
-                lastConnected: new Date().toISOString()
-            };
             
-            // Remove if already exists
-            savedConnections = savedConnections.filter(conn => conn.roomCode !== roomCode);
-            
-            // Add new connection
-            savedConnections.push(newConnection);
-            
-            // Save to localStorage
-            localStorage.setItem('savedConnections', JSON.stringify(savedConnections));
-            
-            // Update UI
-            autoConnectSection.style.display = 'block';
-            savedRoomsSection.style.display = 'block';
-            updateSavedRoomsList();
+            if (window.innerWidth <= 767) {
+                setupPanel.classList.remove('active');
+            }
         }
         
         // Enable chat interface
@@ -556,64 +567,32 @@
             messageInput.disabled = false;
             sendButton.disabled = false;
             chatWithUser.textContent = `Chat with ${currentPartner}`;
-            connectionInfo.textContent = `Room: ${currentRoom} • Auto-saved for future`;
+            connectionInfo.textContent = `Room: ${currentRoom}`;
             
             // Update user list
-            userList.innerHTML = `
-                <div class="user-item active">
+            document.getElementById('userList').innerHTML = `
+                <div class="user-item">
                     <span class="status-indicator online"></span>
-                    <span>You (${isInitiator ? 'Room Creator' : 'Partner'})</span>
+                    <span style="font-size: 14px;">You - Connected</span>
                 </div>
                 <div class="user-item">
-                    <span class="status-indicator connecting"></span>
-                    <span>Connecting to ${currentPartner}...</span>
+                    <span class="status-indicator online"></span>
+                    <span style="font-size: 14px;">${currentPartner}</span>
                 </div>
             `;
         }
         
-        // Simulate connection process
+        // Simulate connection
         function simulateConnection() {
-            updateStatus('Connecting to partner...', 'info');
-            
             setTimeout(() => {
-                updateStatus(`Connected with ${currentPartner}`, 'success');
-                
-                // Update UI
-                userList.innerHTML = `
-                    <div class="user-item active">
-                        <span class="status-indicator online"></span>
-                        <span>You (${isInitiator ? 'Room Creator' : 'Partner'})</span>
-                    </div>
-                    <div class="user-item active">
-                        <span class="status-indicator online"></span>
-                        <span>${currentPartner} (Connected)</span>
-                    </div>
-                `;
-                
-                headerAvatar.src = isInitiator ? 
-                    'https://i.pravatar.cc/150?img=12' : 
-                    'https://i.pravatar.cc/150?img=5';
-                
-                // Add welcome message
+                // Add connection message
                 addMessage({
-                    text: `Automatically connected with ${currentPartner}! No codes needed next time.`,
+                    text: `Connected with ${currentPartner}! Start chatting...`,
                     sender: 'System',
                     time: new Date(),
                     type: 'received'
                 });
-                
-                // Show success message
-                Swal.fire({
-                    title: 'Auto-Connect Enabled!',
-                    text: `Connected with ${currentPartner}. Future connections will be automatic.`,
-                    icon: 'success',
-                    confirmButtonText: 'Start Chatting',
-                    confirmButtonColor: '#667eea',
-                    timer: 3000,
-                    showConfirmButton: false
-                });
-                
-            }, 2000);
+            }, 1000);
         }
         
         // Send message
@@ -631,7 +610,10 @@
             addMessage(message);
             messageInput.value = '';
             
-            // Simulate reply after delay
+            // Clear input and refocus
+            messageInput.focus();
+            
+            // Simulate reply
             setTimeout(() => {
                 simulateReply();
             }, 1000 + Math.random() * 2000);
@@ -642,13 +624,13 @@
             if (!currentPartner) return;
             
             const replies = [
-                "Hello! Great to see you again!",
-                "This auto-reconnect is so convenient!",
-                "No more room codes - this is awesome!",
-                "How have you been?",
-                "I love that we don't need codes anymore",
-                "What's new with you?",
-                "This smart chat system is brilliant!",
+                "Hello! Nice to chat with you!",
+                "How are you doing today?",
+                "This mobile chat works great!",
+                "What would you like to talk about?",
+                "I can see all messages properly now",
+                "The mobile interface is smooth",
+                "Glad we're connected!",
                 "Ready to continue our conversation?"
             ];
             
@@ -664,7 +646,7 @@
             addMessage(message);
         }
         
-        // Add message to chat
+        // Add message to chat (IMPROVED FOR MOBILE)
         function addMessage(message) {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${message.type}`;
@@ -679,55 +661,55 @@
             `;
             
             chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Scroll to bottom smoothly
+            setTimeout(() => {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 100);
+        }
+        
+        // Update status
+        function updateStatus(status, type = 'info') {
+            const statusText = document.getElementById('statusText');
+            statusText.textContent = status;
+            
+            const statusColors = {
+                'info': '#fff3cd',
+                'success': '#d1ecf1', 
+                'error': '#f8d7da',
+                'warning': '#fff3cd'
+            };
+            
+            const borderColors = {
+                'info': '#ffc107',
+                'success': '#0c5460',
+                'error': '#721c24',
+                'warning': '#856404'
+            };
+            
+            document.getElementById('connectionStatus').style.background = statusColors[type];
+            document.getElementById('connectionStatus').style.borderLeftColor = borderColors[type];
         }
         
         // Reset all connections
         function resetAllConnections() {
-            Swal.fire({
-                title: 'Reset All Connections?',
-                text: 'This will remove all saved rooms and partners.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, Reset All',
-                cancelButtonText: 'Cancel',
-                confirmButtonColor: '#dc3545'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Clear all saved data
-                    savedConnections = [];
-                    localStorage.removeItem('savedConnections');
-                    currentRoom = null;
-                    currentPartner = null;
-                    
-                    // Reset UI
-                    autoConnectSection.style.display = 'none';
-                    savedRoomsSection.style.display = 'none';
-                    roomCodeDisplay.style.display = 'none';
-                    joinCodeInput.value = '';
-                    messageInput.disabled = true;
-                    sendButton.disabled = true;
-                    
-                    updateStatus('All connections reset. Ready for new setup.', 'info');
-                    chatWithUser.textContent = 'Smart Chat App';
-                    connectionInfo.textContent = 'Auto-reconnect enabled. No codes needed after first setup.';
-                    headerAvatar.src = 'https://i.pravatar.cc/150?img=5';
-                    
-                    // Reset user list
-                    userList.innerHTML = `
-                        <div class="user-item">
-                            <span class="status-indicator offline"></span>
-                            <span>Not connected</span>
-                        </div>
-                    `;
-                    
-                    // Clear messages except first one
-                    const messages = chatMessages.querySelectorAll('.message');
-                    for (let i = 1; i < messages.length; i++) {
-                        messages[i].remove();
-                    }
-                }
-            });
+            currentRoom = null;
+            currentPartner = null;
+            
+            document.getElementById('roomCodeDisplay').style.display = 'none';
+            document.getElementById('joinCodeInput').value = '';
+            messageInput.disabled = true;
+            sendButton.disabled = true;
+            
+            updateStatus('Reset complete', 'info');
+            chatWithUser.textContent = 'Smart Chat';
+            connectionInfo.textContent = 'Create or join a room';
+            
+            // Clear messages except first three examples
+            const messages = chatMessages.querySelectorAll('.message');
+            for (let i = 3; i < messages.length; i++) {
+                messages[i].remove();
+            }
         }
         
         // Event Listeners
@@ -739,8 +721,21 @@
             }
         });
         
-        // Initialize the app
-        initializeApp();
+        // Auto-focus message input when enabled
+        messageInput.addEventListener('focus', function() {
+            // Ensure virtual keyboard doesn't hide messages on mobile
+            setTimeout(() => {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 300);
+        });
+        
+        // Initialize
+        updateStatus('Ready to connect', 'info');
+        
+        // Show auto connect section for demo
+        setTimeout(() => {
+            document.getElementById('autoConnectSection').style.display = 'block';
+        }, 1000);
     </script>
 </body>
 </html>
