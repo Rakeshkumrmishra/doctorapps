@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Code-Based Chat</title>
+    <title>Advanced Secure Chat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -16,21 +16,123 @@
         
         body {
             background: linear-gradient(135deg, #6e8efb, #a777e3);
+            min-height: 100vh;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Fixed Navigation Bar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            color: #6e8efb;
+            font-size: 20px;
+        }
+        
+        .nav-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            transition: all 0.3s ease;
+        }
+        
+        .status-dot.active {
+            background: #28a745;
+            box-shadow: 0 0 10px #28a745;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .nav-time {
+            font-size: 14px;
+            color: #666;
+            font-weight: 500;
+        }
+        
+        /* Fixed Footer */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            z-index: 1000;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .footer-info {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .footer-security {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-top: 60px;
+            margin-bottom: 50px;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            padding: 0;
+            padding: 20px;
         }
         
         .container {
             width: 100%;
-            height: 100vh;
+            max-width: 1000px;
+            height: calc(100vh - 110px);
             background-color: white;
-            border-radius: 0;
-            box-shadow: none;
-            display: flex;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             overflow: hidden;
+            display: flex;
         }
         
         .sidebar {
@@ -164,12 +266,19 @@
             display: flex;
             align-items: flex-end;
             max-width: 85%;
-            animation: fadeIn 0.3s ease;
+            animation: slideIn 0.3s ease;
+            position: relative;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        @keyframes slideIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px) scale(0.95); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
         }
         
         .message.received {
@@ -192,7 +301,7 @@
         }
         
         .message-content {
-            padding: 10px 15px;
+            padding: 12px 15px;
             border-radius: 18px;
             max-width: 100%;
             word-wrap: break-word;
@@ -202,12 +311,14 @@
         .received .message-content {
             background-color: white;
             border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
         
         .sent .message-content {
-            background-color: #6e8efb;
+            background: linear-gradient(135deg, #6e8efb, #5a7dfa);
             color: white;
             border-bottom-right-radius: 5px;
+            box-shadow: 0 2px 8px rgba(106, 142, 251, 0.3);
         }
         
         .message-time {
@@ -217,11 +328,44 @@
             text-align: right;
         }
         
+        /* Message Status Indicators */
+        .message-status {
+            position: absolute;
+            bottom: -8px;
+            right: 8px;
+            font-size: 10px;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+        }
+        
+        .sent .message-status {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .message-sending {
+            color: #ffc107;
+        }
+        
+        .message-sent {
+            color: #28a745;
+        }
+        
+        .message-delivered {
+            color: #17a2b8;
+        }
+        
+        .message-read {
+            color: #6e8efb;
+        }
+        
         .chat-input {
             display: flex;
             padding: 15px;
             background-color: white;
             border-top: 1px solid #e6e6e6;
+            align-items: center;
         }
         
         .chat-input input {
@@ -232,23 +376,33 @@
             outline: none;
             font-size: 14px;
             min-width: 50px;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-input input:focus {
+            border-color: #6e8efb;
+            box-shadow: 0 0 0 2px rgba(110, 142, 251, 0.1);
         }
         
         .chat-input button {
             margin-left: 10px;
             padding: 10px 20px;
-            background-color: #6e8efb;
+            background: linear-gradient(135deg, #6e8efb, #5a7dfa);
             color: white;
             border: none;
             border-radius: 24px;
             cursor: pointer;
             font-weight: 600;
-            transition: background-color 0.2s;
+            transition: all 0.3s ease;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         
         .chat-input button:hover {
-            background-color: #5a7dfa;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(110, 142, 251, 0.3);
         }
         
         .typing-indicator {
@@ -264,7 +418,7 @@
             max-width: 450px;
             padding: 30px;
             background-color: white;
-            border-radius: 12px;
+            border-radius: 15px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
             text-align: center;
         }
@@ -277,18 +431,19 @@
         .login-container button {
             width: 100%;
             padding: 12px;
-            background-color: #6e8efb;
+            background: linear-gradient(135deg, #6e8efb, #5a7dfa);
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             cursor: pointer;
             font-weight: 600;
-            transition: background-color 0.2s;
+            transition: all 0.3s ease;
             margin-top: 20px;
         }
         
         .login-container button:hover {
-            background-color: #5a7dfa;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(110, 142, 251, 0.3);
         }
         
         .user-codes {
@@ -306,6 +461,12 @@
             background-color: #f5f7fb;
             border-radius: 8px;
             border-left: 4px solid #6e8efb;
+            transition: all 0.3s ease;
+        }
+        
+        .user-code-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
         
         .user-code-info {
@@ -333,60 +494,10 @@
             border: 1px dashed #6e8efb;
         }
         
-        .status-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            margin-right: 5px;
-        }
-        
-        .status-online {
-            background-color: #4CAF50;
-        }
-        
-        .status-offline {
-            background-color: #f44336;
-        }
-        
-        .connection-status {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            padding: 8px 12px;
-            border-radius: 4px;
-            font-size: 12px;
-            z-index: 1000;
-        }
-        
-        .connection-connected {
-            background-color: #4CAF50;
-            color: white;
-        }
-        
-        .connection-disconnected {
-            background-color: #f44336;
-            color: white;
-        }
-        
-        .back-home-btn {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            background: #6e8efb;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 8px 15px;
-            cursor: pointer;
-            font-size: 14px;
-            z-index: 100;
-        }
-        
         /* Mobile Styles */
         @media (max-width: 900px) {
             .container {
-                height: 100vh;
+                height: calc(100vh - 110px);
                 border-radius: 0;
             }
             
@@ -411,6 +522,10 @@
             .message {
                 max-width: 90%;
             }
+            
+            .navbar, .footer {
+                padding: 0 15px;
+            }
         }
         
         @media (max-width: 768px) {
@@ -432,7 +547,7 @@
             }
             
             .message-content {
-                padding: 8px 12px;
+                padding: 10px 12px;
             }
             
             .chat-input {
@@ -454,7 +569,7 @@
             }
             
             .container {
-                height: 100vh;
+                height: calc(100vh - 110px);
             }
             
             .login-container {
@@ -497,131 +612,129 @@
             .mobile-menu-btn {
                 font-size: 16px;
             }
-            
-            .back-home-btn {
-                top: 10px;
-                left: 10px;
-                padding: 6px 12px;
-                font-size: 12px;
-            }
-        }
-        
-        @media (min-width: 901px) {
-            .container {
-                height: 90vh;
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-                max-width: 1000px;
-            }
-            
-            body {
-                padding: 20px;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- Connection Status -->
-    <div id="connectionStatus" class="connection-status connection-disconnected" style="display: none;">
-        Connecting to Firebase...
-    </div>
-
-    <!-- Back to Home Button -->
-    <button id="backHomeBtn" class="back-home-btn" style="display: none;">
-        <i class="fas fa-home"></i> Back Home
-    </button>
-
-    <!-- Login Screen -->
-    <div id="loginScreen" class="login-container">
-        <h2>Secure Code-Based Chat</h2>
-        <p style="margin-bottom: 20px; color: #666;">Enter your unique code to access the chat</p>
-        
-        <button onclick="showCodePopup()">
-            <i class="fas fa-key"></i> Enter Access Code
-        </button>
-        
-        <div class="user-codes">
-            <h3 style="margin: 20px 0 10px; color: #333; text-align: left;">Available User Codes:</h3>
-            <div class="user-code-item">
-                <div class="user-code-info">
-                    <h4>Alex Johnson</h4>
-                    <p>Use this code to login as Alex</p>
-                </div>
-                <div class="user-code">ALEX123</div>
-            </div>
-            <div class="user-code-item">
-                <div class="user-code-info">
-                    <h4>Sam Wilson</h4>
-                    <p>Use this code to login as Sam</p>
-                </div>
-                <div class="user-code">SAM456</div>
-            </div>
+    <!-- Fixed Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-brand">
+            <i class="fas fa-comments"></i>
+            <span>SecureChat Pro</span>
         </div>
-        
-        <div style="margin-top: 25px; padding: 15px; background-color: #f9f9f9; border-radius: 8px;">
-            <h4 style="color: #333; margin-bottom: 10px;">How to use:</h4>
-            <ol style="text-align: left; padding-left: 20px; color: #666;">
-                <li>Click "Enter Access Code" button</li>
-                <li>Enter one of the codes above</li>
-                <li>Chat will open automatically</li>
-            </ol>
+        <div class="nav-status">
+            <div class="status-dot" id="globalStatusDot"></div>
+            <span id="globalStatusText">Offline</span>
+            <div class="nav-time" id="currentTime"></div>
         </div>
-    </div>
-    
-    <!-- Chat Interface -->
-    <div id="chatScreen" class="container" style="display: none;">
-        <div class="sidebar" id="sidebar">
-            <div class="user-profile">
-                <img src="https://i.pravatar.cc/150?img=5" alt="User" class="user-avatar" id="currentUserAvatar">
-                <div class="user-info">
-                    <h3 id="currentUserName">Alex Johnson</h3>
-                    <p id="userStatus"><span class="status-indicator status-online"></span>Online</p>
+    </nav>
+
+    <!-- Fixed Footer -->
+    <footer class="footer">
+        <div class="footer-info">
+            <span id="messageCount">Messages: 0</span>
+            <span id="onlineStatus">Status: Offline</span>
+        </div>
+        <div class="footer-security">
+            <i class="fas fa-shield-alt"></i>
+            <span>End-to-End Encrypted</span>
+        </div>
+    </footer>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Login Screen -->
+        <div id="loginScreen" class="login-container">
+            <h2>Secure Code-Based Chat</h2>
+            <p style="margin-bottom: 20px; color: #666;">Enter your unique code to access the chat</p>
+            
+            <button onclick="showCodePopup()">
+                <i class="fas fa-key"></i> Enter Access Code
+            </button>
+            
+            <div class="user-codes">
+                <h3 style="margin: 20px 0 10px; color: #333; text-align: left;">Available User Codes:</h3>
+                <div class="user-code-item">
+                    <div class="user-code-info">
+                        <h4>Alex Johnson</h4>
+                        <p>Use this code to login as Alex</p>
+                    </div>
+                    <div class="user-code">ALEX123</div>
+                </div>
+                <div class="user-code-item">
+                    <div class="user-code-info">
+                        <h4>Sam Wilson</h4>
+                        <p>Use this code to login as Sam</p>
+                    </div>
+                    <div class="user-code">SAM456</div>
                 </div>
             </div>
             
-            <div class="contact-list">
-                <div class="contact active">
-                    <img src="https://i.pravatar.cc/150?img=12" alt="Contact" class="contact-avatar">
-                    <div class="contact-info">
-                        <h4 id="contactName">Sam Wilson</h4>
-                        <p id="contactStatus"><span class="status-indicator status-online"></span>Online</p>
+            <div style="margin-top: 25px; padding: 15px; background-color: #f9f9f9; border-radius: 8px;">
+                <h4 style="color: #333; margin-bottom: 10px;">Advanced Features:</h4>
+                <ul style="text-align: left; padding-left: 20px; color: #666;">
+                    <li>Fixed Navigation & Footer</li>
+                    <li>Real-time Status Indicators</li>
+                    <li>Message Delivery Symbols</li>
+                    <li>Active Connection Monitoring</li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Chat Interface -->
+        <div id="chatScreen" class="container" style="display: none;">
+            <div class="sidebar" id="sidebar">
+                <div class="user-profile">
+                    <img src="https://i.pravatar.cc/150?img=5" alt="User" class="user-avatar" id="currentUserAvatar">
+                    <div class="user-info">
+                        <h3 id="currentUserName">Alex Johnson</h3>
+                        <p id="userStatus"><span class="status-indicator status-online"></span>Online</p>
                     </div>
                 </div>
-            </div>
-        </div>
-        
-        <div class="chat-area">
-            <div class="chat-header">
-                <button class="mobile-menu-btn" id="mobileMenuBtn">
-                    <i class="fas fa-bars"></i>
-                </button>
-                <img src="https://i.pravatar.cc/150?img=12" alt="Contact" class="user-avatar">
-                <div class="chat-header-info">
-                    <h3 id="chatContactName">Sam Wilson</h3>
-                    <p id="chatContactStatus"><span class="status-indicator status-online"></span>Online</p>
-                </div>
-            </div>
-            
-            <div class="chat-messages" id="chatMessages">
-                <!-- Messages will be loaded here from Firebase -->
-                <div class="message received">
-                    <img src="https://i.pravatar.cc/150?img=12" alt="Alex" class="message-avatar">
-                    <div class="message-content">
-                        <p>Welcome to the secure chat! Enter your code to start messaging.</p>
-                        <div class="message-time" id="welcome-time">System</div>
+                
+                <div class="contact-list">
+                    <div class="contact active">
+                        <img src="https://i.pravatar.cc/150?img=12" alt="Contact" class="contact-avatar">
+                        <div class="contact-info">
+                            <h4 id="contactName">Sam Wilson</h4>
+                            <p id="contactStatus"><span class="status-indicator status-online"></span>Online</p>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <div class="typing-indicator" id="typingIndicator">
-                <span id="typingText">Someone is typing...</span>
-            </div>
-            
-            <div class="chat-input">
-                <input type="text" id="messageInput" placeholder="Type a message...">
-                <button id="sendButton">
-                    <i class="fas fa-paper-plane"></i> <span>Send</span>
-                </button>
+            <div class="chat-area">
+                <div class="chat-header">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <img src="https://i.pravatar.cc/150?img=12" alt="Contact" class="user-avatar">
+                    <div class="chat-header-info">
+                        <h3 id="chatContactName">Sam Wilson</h3>
+                        <p id="chatContactStatus"><span class="status-indicator status-online"></span>Online</p>
+                    </div>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <div class="message received">
+                        <img src="https://i.pravatar.cc/150?img=12" alt="Alex" class="message-avatar">
+                        <div class="message-content">
+                            <p>Welcome to Advanced Secure Chat! Fixed navbar and footer with real-time indicators.</p>
+                            <div class="message-time">System</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="typing-indicator" id="typingIndicator">
+                    <span id="typingText">Someone is typing...</span>
+                </div>
+                
+                <div class="chat-input">
+                    <input type="text" id="messageInput" placeholder="Type a message...">
+                    <button id="sendButton">
+                        <i class="fas fa-paper-plane"></i> <span>Send</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -663,6 +776,8 @@
         let unsubscribeMessages = null;
         let firebaseInitialized = false;
         let db = null;
+        let messageCount = 0;
+        let isActive = false;
         
         // DOM Elements
         const loginScreen = document.getElementById('loginScreen');
@@ -670,15 +785,45 @@
         const chatMessages = document.getElementById('chatMessages');
         const messageInput = document.getElementById('messageInput');
         const sendButton = document.getElementById('sendButton');
-        const typingIndicator = document.getElementById('typingIndicator');
         const currentUserName = document.getElementById('currentUserName');
         const currentUserAvatar = document.getElementById('currentUserAvatar');
         const contactName = document.getElementById('contactName');
         const chatContactName = document.getElementById('chatContactName');
         const sidebar = document.getElementById('sidebar');
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const connectionStatus = document.getElementById('connectionStatus');
-        const backHomeBtn = document.getElementById('backHomeBtn');
+        const globalStatusDot = document.getElementById('globalStatusDot');
+        const globalStatusText = document.getElementById('globalStatusText');
+        const currentTime = document.getElementById('currentTime');
+        const messageCountElement = document.getElementById('messageCount');
+        const onlineStatusElement = document.getElementById('onlineStatus');
+        
+        // Update time function
+        function updateTime() {
+            const now = new Date();
+            currentTime.textContent = now.toLocaleTimeString([], { 
+                hour: '2-digit', minute: '2-digit' 
+            });
+        }
+        
+        // Update global status
+        function updateGlobalStatus(active) {
+            isActive = active;
+            if (active) {
+                globalStatusDot.classList.add('active');
+                globalStatusText.textContent = 'Online';
+                onlineStatusElement.textContent = 'Status: Online';
+            } else {
+                globalStatusDot.classList.remove('active');
+                globalStatusText.textContent = 'Offline';
+                onlineStatusElement.textContent = 'Status: Offline';
+            }
+        }
+        
+        // Update message count
+        function updateMessageCount() {
+            messageCount++;
+            messageCountElement.textContent = `Messages: ${messageCount}`;
+        }
         
         // Show code input popup
         function showCodePopup() {
@@ -751,7 +896,9 @@
             // Show chat interface
             loginScreen.style.display = 'none';
             chatScreen.style.display = 'flex';
-            backHomeBtn.style.display = 'block';
+            
+            // Update global status
+            updateGlobalStatus(true);
             
             // Initialize Firebase if not already done
             if (!firebaseInitialized) {
@@ -776,47 +923,12 @@
             });
         }
         
-        // Show back home confirmation
-        function showBackHomeConfirmation() {
-            Swal.fire({
-                title: 'Leave Chat?',
-                text: 'Are you sure you want to go back to the home screen?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonText: 'Yes, Go Home',
-                cancelButtonText: 'Stay in Chat',
-                confirmButtonColor: '#6e8efb',
-                backdrop: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    goBackHome();
-                }
-            });
-        }
-        
-        // Go back to home screen
-        function goBackHome() {
-            if (unsubscribeMessages) {
-                unsubscribeMessages();
-            }
-            
-            chatScreen.style.display = 'none';
-            loginScreen.style.display = 'block';
-            backHomeBtn.style.display = 'none';
-            
-            // Reset state
-            currentUser = '';
-            currentUserId = '';
-        }
-        
-        // Initialize Firebase with error handling
+        // Initialize Firebase
         function initializeFirebase() {
             try {
-                // Initialize Firebase
                 firebase.initializeApp(firebaseConfig);
                 db = firebase.firestore();
                 
-                // Enable offline persistence
                 db.enablePersistence()
                     .then(() => {
                         console.log("Firebase persistence enabled");
@@ -825,15 +937,12 @@
                         console.log("Persistence failed: ", err);
                     });
                 
-                // Monitor connection state
                 firebase.firestore().enableNetwork()
                     .then(() => {
                         console.log("Firebase connected");
-                        updateConnectionStatus(true);
                     })
                     .catch((error) => {
                         console.error("Firebase connection error: ", error);
-                        updateConnectionStatus(false);
                     });
                 
                 firebaseInitialized = true;
@@ -841,41 +950,14 @@
                 
             } catch (error) {
                 console.error("Firebase initialization error: ", error);
-                updateConnectionStatus(false);
-                showError("Firebase initialization failed. Using demo mode.");
-                // Continue in demo mode
                 firebaseInitialized = false;
             }
-        }
-        
-        // Update connection status display
-        function updateConnectionStatus(connected) {
-            connectionStatus.style.display = 'block';
-            if (connected) {
-                connectionStatus.textContent = 'Connected to Firebase';
-                connectionStatus.className = 'connection-status connection-connected';
-            } else {
-                connectionStatus.textContent = 'Disconnected - Using Demo Mode';
-                connectionStatus.className = 'connection-status connection-disconnected';
-            }
-        }
-        
-        // Show error message
-        function showError(message) {
-            Swal.fire({
-                title: 'Error',
-                text: message,
-                icon: 'error',
-                confirmButtonText: 'OK',
-                confirmButtonColor: '#6e8efb'
-            });
         }
         
         // Load messages from Firestore
         function loadMessages() {
             if (!firebaseInitialized || !db) {
                 console.log("Firebase not available, using demo mode");
-                showDemoMessage();
                 return;
             }
             
@@ -894,27 +976,13 @@
                     querySnapshot.forEach((doc) => {
                         const message = doc.data();
                         displayMessage(message, false);
+                        updateMessageCount();
                     });
                     chatMessages.scrollTop = chatMessages.scrollHeight;
                 })
                 .catch((error) => {
                     console.error("Error loading messages: ", error);
-                    showDemoMessage();
                 });
-        }
-        
-        // Show demo message when Firebase fails
-        function showDemoMessage() {
-            const demoMsg = document.createElement('div');
-            demoMsg.className = 'message received';
-            demoMsg.innerHTML = `
-                <img src="https://i.pravatar.cc/150?img=12" alt="System" class="message-avatar">
-                <div class="message-content">
-                    <p><strong>Demo Mode:</strong> Firebase connection failed. Messages won't be saved.</p>
-                    <div class="message-time">System</div>
-                </div>
-            `;
-            chatMessages.appendChild(demoMsg);
         }
         
         // Set up real-time listener for new messages
@@ -929,12 +997,31 @@
                             const message = change.doc.data();
                             if (message.senderId !== currentUserId) {
                                 displayMessage(message, true);
+                                updateMessageCount();
+                                
+                                // Show message received indicator
+                                showMessageIndicator('received');
                             }
                         }
                     });
                 }, (error) => {
                     console.error("Message listener error: ", error);
                 });
+        }
+        
+        // Show message status indicator
+        function showMessageIndicator(type) {
+            const indicator = document.createElement('div');
+            indicator.className = `message-indicator ${type}`;
+            indicator.innerHTML = type === 'sent' ? 
+                '<i class="fas fa-check-double"></i>' : 
+                '<i class="fas fa-bell"></i>';
+            
+            document.body.appendChild(indicator);
+            
+            setTimeout(() => {
+                indicator.remove();
+            }, 2000);
         }
         
         // Send message function
@@ -951,9 +1038,13 @@
                 timestamp: new Date()
             };
             
-            // Display message immediately for better UX
-            displayMessage(message, true);
+            // Display message immediately with sending status
+            const messageId = displayMessage(message, true, 'sending');
+            updateMessageCount();
             messageInput.value = '';
+            
+            // Show sending indicator
+            showMessageIndicator('sent');
             
             // Try to save to Firebase if available
             if (firebaseInitialized && db) {
@@ -962,23 +1053,26 @@
                 db.collection('messages').add(message)
                     .then(() => {
                         console.log("Message saved to Firebase");
+                        // Update message status to sent
+                        updateMessageStatus(messageId, 'sent');
                     })
                     .catch((error) => {
                         console.error("Error saving message to Firebase: ", error);
-                        showError("Message saved locally (Firebase error)");
+                        updateMessageStatus(messageId, 'error');
                     });
             } else {
-                showError("Message saved locally (Demo mode)");
+                updateMessageStatus(messageId, 'sent');
             }
         }
         
-        // Display message in chat
-        function displayMessage(message, animate = true) {
+        // Display message in chat with status
+        function displayMessage(message, animate = true, status = 'sent') {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${message.senderId === currentUserId ? 'sent' : 'received'}`;
+            messageDiv.dataset.messageId = Date.now();
             
             if (animate) {
-                messageDiv.style.animation = 'fadeIn 0.3s ease';
+                messageDiv.style.animation = 'slideIn 0.3s ease';
             }
             
             const avatarSrc = message.senderId === currentUserId 
@@ -996,16 +1090,60 @@
                 }
             }
             
+            // Status indicator based on message state
+            let statusIcon = '';
+            if (message.senderId === currentUserId) {
+                switch(status) {
+                    case 'sending':
+                        statusIcon = '<span class="message-status message-sending"><i class="fas fa-clock"></i></span>';
+                        break;
+                    case 'sent':
+                        statusIcon = '<span class="message-status message-sent"><i class="fas fa-check"></i></span>';
+                        break;
+                    case 'delivered':
+                        statusIcon = '<span class="message-status message-delivered"><i class="fas fa-check-double"></i></span>';
+                        break;
+                    case 'read':
+                        statusIcon = '<span class="message-status message-read"><i class="fas fa-check-double"></i></span>';
+                        break;
+                }
+            }
+            
             messageDiv.innerHTML = `
                 <img src="${avatarSrc}" alt="${message.sender}" class="message-avatar">
                 <div class="message-content">
                     <p>${message.text}</p>
                     <div class="message-time">${timeString}</div>
+                    ${statusIcon}
                 </div>
             `;
             
             chatMessages.appendChild(messageDiv);
             chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            return messageDiv.dataset.messageId;
+        }
+        
+        // Update message status
+        function updateMessageStatus(messageId, status) {
+            const messageDiv = document.querySelector(`[data-message-id="${messageId}"]`);
+            if (messageDiv) {
+                const statusElement = messageDiv.querySelector('.message-status');
+                if (statusElement) {
+                    statusElement.className = `message-status message-${status}`;
+                    switch(status) {
+                        case 'sent':
+                            statusElement.innerHTML = '<i class="fas fa-check"></i>';
+                            break;
+                        case 'delivered':
+                            statusElement.innerHTML = '<i class="fas fa-check-double"></i>';
+                            break;
+                        case 'read':
+                            statusElement.innerHTML = '<i class="fas fa-check-double" style="color: #6e8efb;"></i>';
+                            break;
+                    }
+                }
+            }
         }
         
         // Mobile menu toggle
@@ -1029,9 +1167,6 @@
             }
         });
         
-        // Back home button
-        backHomeBtn.addEventListener('click', showBackHomeConfirmation);
-        
         // Handle window resize
         window.addEventListener('resize', function() {
             if (window.innerWidth > 900) {
@@ -1046,14 +1181,20 @@
             }
         });
         
-        // Initialize Firebase
+        // Handle visibility change (tab active/inactive)
+        document.addEventListener('visibilitychange', function() {
+            updateGlobalStatus(!document.hidden);
+        });
+        
+        // Initialize
         initializeFirebase();
+        updateTime();
+        setInterval(updateTime, 60000); // Update time every minute
         
         // Auto-show code popup after a short delay
         setTimeout(() => {
-            // Uncomment the line below if you want the code popup to appear automatically
-            // showCodePopup();
-        }, 500);
+            // showCodePopup(); // Uncomment to auto-show code popup
+        }, 1000);
     </script>
 </body>
 </html>
