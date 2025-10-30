@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Working Chat App</title>
+    <title>Real Backend Chat</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -152,28 +152,49 @@
             text-align: center;
             font-size: 14px;
         }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid #667eea;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="connection-panel">
-            <div class="status" id="status">Ready to chat</div>
-            <button class="btn btn-primary" onclick="startChatAsPerson1()">
-                <i class="fas fa-user"></i> Start as Person 1
+            <div class="user-info">
+                <img src="https://i.pravatar.cc/150?img=5" class="user-avatar" id="userAvatar">
+                <div>
+                    <strong id="userName">Choose Your Role</strong>
+                    <div class="status" id="status">Disconnected</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="loginAsPerson1()">
+                <i class="fas fa-user"></i> Login as Person 1 (Alex)
             </button>
-            <button class="btn btn-success" onclick="startChatAsPerson2()">
-                <i class="fas fa-user"></i> Start as Person 2
+            <button class="btn btn-success" onclick="loginAsPerson2()">
+                <i class="fas fa-user"></i> Login as Person 2 (Sam)
             </button>
         </div>
         
         <div class="chat-header">
-            <h3 id="chatTitle">Simple Chat App</h3>
-            <p id="chatSubtitle">Choose your role to start</p>
+            <h3 id="chatTitle">Real Backend Chat</h3>
+            <p id="chatSubtitle">Firebase Real-time Database</p>
         </div>
         
         <div class="chat-messages" id="chatMessages">
             <div class="message received">
-                <div>Welcome! Click buttons above to start chatting.</div>
+                <div>Welcome to Real Backend Chat! Login to start real messaging.</div>
                 <div class="message-time">System</div>
             </div>
         </div>
@@ -186,11 +207,31 @@
         </div>
     </div>
 
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
     <script>
-        // Simple Chat Functionality - No Console Errors
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBnPD7v-8IGqrYepC2RvJDJRS2gFFvl2f8",
+            authDomain: "student-database-e3f5c.firebaseapp.com",
+            databaseURL: "https://student-database-e3f5c-default-rtdb.firebaseio.com",
+            projectId: "student-database-e3f5c",
+            storageBucket: "student-database-e3f5c.firebasestorage.app",
+            messagingSenderId: "502335602197",
+            appId: "1:502335602197:web:7eea29a2b2402d98e1d81c"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Chat Variables
+        let currentUser = null;
         let chatActive = false;
-        let currentUser = '';
-        
+        let messagesRef = null;
+
         // DOM Elements
         const chatMessages = document.getElementById('chatMessages');
         const messageInput = document.getElementById('messageInput');
@@ -198,69 +239,119 @@
         const status = document.getElementById('status');
         const chatTitle = document.getElementById('chatTitle');
         const chatSubtitle = document.getElementById('chatSubtitle');
-        
-        // Start as Person 1
-        function startChatAsPerson1() {
-            currentUser = 'Person 1';
-            chatActive = true;
-            
-            enableChat();
-            updateStatus('You are Person 1 - Start chatting!', 'success');
-            chatTitle.textContent = 'Chat - Person 1';
-            chatSubtitle.textContent = 'Connected and ready';
-            
-            addSystemMessage('You are now Person 1. Start the conversation!');
+        const userName = document.getElementById('userName');
+        const userAvatar = document.getElementById('userAvatar');
+
+        // Login as Person 1
+        function loginAsPerson1() {
+            currentUser = {
+                id: 'person1',
+                name: 'Alex Johnson',
+                avatar: 'https://i.pravatar.cc/150?img=5'
+            };
+            initializeChat();
         }
-        
-        // Start as Person 2
-        function startChatAsPerson2() {
-            currentUser = 'Person 2';
-            chatActive = true;
-            
-            enableChat();
-            updateStatus('You are Person 2 - Start chatting!', 'success');
-            chatTitle.textContent = 'Chat - Person 2';
-            chatSubtitle.textContent = 'Connected and ready';
-            
-            addSystemMessage('You are now Person 2. Start the conversation!');
+
+        // Login as Person 2
+        function loginAsPerson2() {
+            currentUser = {
+                id: 'person2', 
+                name: 'Sam Wilson',
+                avatar: 'https://i.pravatar.cc/150?img=12'
+            };
+            initializeChat();
         }
-        
+
+        // Initialize Chat with Firebase
+        function initializeChat() {
+            if (!currentUser) return;
+
+            chatActive = true;
+            messagesRef = database.ref('chat/messages');
+
+            // Update UI
+            enableChat();
+            updateStatus('Connected to Firebase - Real-time chat active', 'success');
+            userName.textContent = currentUser.name;
+            userAvatar.src = currentUser.avatar;
+            chatTitle.textContent = `Chat - ${currentUser.name}`;
+            chatSubtitle.textContent = 'Real-time Firebase Database';
+
+            // Clear existing messages
+            chatMessages.innerHTML = '';
+
+            // Load existing messages from Firebase
+            loadMessages();
+
+            // Listen for new messages
+            setupMessageListener();
+
+            addSystemMessage(`You are logged in as ${currentUser.name}. Start real-time chatting!`);
+        }
+
+        // Load messages from Firebase
+        function loadMessages() {
+            messagesRef.orderByChild('timestamp').once('value')
+                .then((snapshot) => {
+                    snapshot.forEach((childSnapshot) => {
+                        const message = childSnapshot.val();
+                        displayMessage(message);
+                    });
+                    scrollToBottom();
+                })
+                .catch((error) => {
+                    console.error('Error loading messages:', error);
+                    addSystemMessage('Error loading messages. Using demo mode.');
+                });
+        }
+
+        // Setup real-time message listener
+        function setupMessageListener() {
+            messagesRef.orderByChild('timestamp').on('child_added', (snapshot) => {
+                const message = snapshot.val();
+                // Only display if not sent by current user (to avoid duplicates)
+                if (message.senderId !== currentUser.id) {
+                    displayMessage(message);
+                }
+            });
+        }
+
         // Enable chat functionality
         function enableChat() {
             messageInput.disabled = false;
             sendButton.disabled = false;
             
-            // Focus on input
             setTimeout(() => {
                 messageInput.focus();
             }, 100);
         }
-        
+
         // Update status
         function updateStatus(message, type = 'info') {
             status.textContent = message;
             status.style.background = type === 'success' ? '#d4edda' : '#fff3cd';
             status.style.color = type === 'success' ? '#155724' : '#856404';
+            status.style.border = type === 'success' ? '1px solid #c3e6cb' : '1px solid #ffeaa7';
         }
-        
+
         // Add system message
         function addSystemMessage(text) {
             const message = {
                 text: text,
                 sender: 'System',
-                time: new Date(),
+                timestamp: Date.now(),
                 type: 'received'
             };
-            addMessage(message);
+            displayMessage(message);
         }
-        
-        // Send message - MAIN FUNCTION
+
+        // Send message to Firebase
         function sendMessage() {
-            if (!chatActive) {
-                alert('Please select your role first!');
+            if (!chatActive || !currentUser) {
+                alert('Please login first!');
                 return;
             }
-            
+
             const text = messageInput.value.trim();
             
             if (!text) {
@@ -268,110 +359,70 @@
                 messageInput.focus();
                 return;
             }
-            
-            console.log('Sending message:', text); // Debug log
-            
-            // Create and add sent message
-            const sentMessage = {
+
+            // Create message object
+            const message = {
                 text: text,
-                sender: 'You',
-                time: new Date(),
+                sender: currentUser.name,
+                senderId: currentUser.id,
+                timestamp: Date.now(),
                 type: 'sent'
             };
-            addMessage(sentMessage);
-            
+
+            // Display message immediately
+            displayMessage(message);
+
             // Clear input
             messageInput.value = '';
-            
-            // Refocus input
             messageInput.focus();
-            
-            // Simulate reply after 1-2 seconds
-            setTimeout(() => {
-                simulateReply(text);
-            }, 1000 + Math.random() * 1000);
+
+            // Save to Firebase
+            saveMessageToFirebase(message);
         }
-        
-        // Simulate reply from other person
-        function simulateReply(yourMessage) {
-            if (!chatActive) return;
-            
-            const otherPerson = currentUser === 'Person 1' ? 'Person 2' : 'Person 1';
-            
-            // Smart replies based on your message
-            let reply;
-            const lowerMessage = yourMessage.toLowerCase();
-            
-            if (lowerMessage.includes('hello') || lowerMessage.includes('hi') || lowerMessage.includes('hey')) {
-                reply = "Hello! Nice to meet you! How are you doing?";
-            } else if (lowerMessage.includes('how are you')) {
-                reply = "I'm doing great! Thanks for asking. How about you?";
-            } else if (lowerMessage.includes('?')) {
-                reply = "That's a good question! Let me think about it...";
-            } else if (lowerMessage.includes('thank')) {
-                reply = "You're welcome! 😊";
-            } else if (lowerMessage.includes('name')) {
-                reply = `I'm ${otherPerson}. Nice to meet you!`;
-            } else if (lowerMessage.includes('weather')) {
-                reply = "The weather is nice today! Perfect for chatting.";
-            } else if (lowerMessage.includes('love') || lowerMessage.includes('like')) {
-                reply = "That's wonderful to hear!";
-            } else {
-                // Random friendly replies
-                const replies = [
-                    "That's interesting! Tell me more.",
-                    "I understand what you mean.",
-                    "That sounds great!",
-                    "What do you think about this?",
-                    "I agree with you!",
-                    "That's a good point!",
-                    "Thanks for sharing that!",
-                    "What are your plans for today?",
-                    "That's really helpful!",
-                    "I'm happy we're chatting!",
-                    "That's amazing!",
-                    "How's your day going?",
-                    "That's cool!",
-                    "I'd love to hear more!",
-                    "That's fantastic news!"
-                ];
-                reply = replies[Math.floor(Math.random() * replies.length)];
-            }
-            
-            console.log('Simulating reply:', reply); // Debug log
-            
-            const receivedMessage = {
-                text: reply,
-                sender: otherPerson,
-                time: new Date(),
-                type: 'received'
-            };
-            addMessage(receivedMessage);
+
+        // Save message to Firebase
+        function saveMessageToFirebase(message) {
+            const newMessageRef = messagesRef.push();
+            newMessageRef.set(message)
+                .then(() => {
+                    console.log('Message saved to Firebase');
+                })
+                .catch((error) => {
+                    console.error('Error saving message:', error);
+                    addSystemMessage('Error sending message. Please try again.');
+                });
         }
-        
-        // Add message to chat
-        function addMessage(message) {
+
+        // Display message in chat
+        function displayMessage(message) {
+            // Check if message is from current user
+            const isSent = message.senderId === currentUser?.id;
+            
             const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${message.type}`;
+            messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
             
-            const timeString = message.time.toLocaleTimeString([], { 
+            const date = new Date(message.timestamp);
+            const timeString = date.toLocaleTimeString([], { 
                 hour: '2-digit', minute: '2-digit' 
             });
-            
+
             messageDiv.innerHTML = `
                 <div>${message.text}</div>
                 <div class="message-time">${message.sender} • ${timeString}</div>
             `;
-            
+
             chatMessages.appendChild(messageDiv);
-            
-            // Scroll to bottom
+            scrollToBottom();
+        }
+
+        // Scroll to bottom of chat
+        function scrollToBottom() {
             setTimeout(() => {
                 chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 50);
+            }, 100);
         }
-        
-        // Event Listeners - Simple and Clean
+
+        // Event Listeners
         sendButton.addEventListener('click', sendMessage);
         
         messageInput.addEventListener('keypress', function(e) {
@@ -379,13 +430,14 @@
                 sendMessage();
             }
         });
-        
+
         // Initialize
-        console.log('Chat app loaded successfully');
-        
+        console.log('Real Backend Chat loaded with Firebase');
+        updateStatus('Please login to start real-time chat');
+
         // Add welcome message
         setTimeout(() => {
-            addSystemMessage('This is a working chat demo. Click the buttons above to start!');
+            addSystemMessage('This chat uses Firebase Real-time Database. Messages are stored in cloud and sync between users.');
         }, 1000);
     </script>
 </body>
