@@ -257,6 +257,84 @@
             cursor: pointer;
         }
         
+        /* Notification Styles */
+        .notification-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #ff4757;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1000;
+            animation: pulse 2s infinite;
+        }
+        
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 10px;
+            padding: 15px 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 300px;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification-toast.show {
+            transform: translateX(0);
+        }
+        
+        .notification-toast i {
+            color: #667eea;
+            font-size: 20px;
+        }
+        
+        .notification-content {
+            flex: 1;
+        }
+        
+        .notification-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .notification-message {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .notification-close {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .notification-close:hover {
+            color: #333;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
         @media (max-width: 768px) {
             .container {
                 flex-direction: column;
@@ -273,10 +351,32 @@
             .message {
                 max-width: 85%;
             }
+            
+            .notification-toast {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Notification Badge -->
+    <div class="notification-badge" id="notificationBadge" style="display: none;"></div>
+    
+    <!-- Notification Toast -->
+    <div class="notification-toast" id="notificationToast">
+        <i class="fas fa-comment-alt"></i>
+        <div class="notification-content">
+            <div class="notification-title" id="notificationTitle">New Message</div>
+            <div class="notification-message" id="notificationMessage">You have new messages</div>
+        </div>
+        <button class="notification-close" id="notificationClose">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
     <div class="container">
         <!-- Setup Panel -->
         <div class="setup-panel">
@@ -385,6 +485,9 @@
         let currentPartner = null;
         let isInitiator = false;
         let savedConnections = JSON.parse(localStorage.getItem('savedConnections')) || [];
+        let unreadMessageCount = 0;
+        let isChatFocused = true;
+        let notificationTimeout = null;
         
         // DOM Elements
         const connectionStatus = document.getElementById('connectionStatus');
@@ -404,10 +507,92 @@
         const savedRoomsSection = document.getElementById('savedRoomsSection');
         const savedRoomsList = document.getElementById('savedRoomsList');
         
+        // Notification Elements
+        const notificationBadge = document.getElementById('notificationBadge');
+        const notificationToast = document.getElementById('notificationToast');
+        const notificationTitle = document.getElementById('notificationTitle');
+        const notificationMessage = document.getElementById('notificationMessage');
+        const notificationClose = document.getElementById('notificationClose');
+        
         // Initialize the app
         function initializeApp() {
             checkSavedConnections();
             updateStatus('Smart Chat Ready - Auto-reconnect enabled', 'info');
+            setupNotificationListeners();
+        }
+        
+        // Setup notification event listeners
+        function setupNotificationListeners() {
+            // Close notification when close button is clicked
+            notificationClose.addEventListener('click', hideNotification);
+            
+            // Mark messages as read when chat is focused
+            window.addEventListener('focus', () => {
+                isChatFocused = true;
+                markMessagesAsRead();
+            });
+            
+            window.addEventListener('blur', () => {
+                isChatFocused = false;
+            });
+            
+            // Mark messages as read when clicking on the chat area
+            chatMessages.addEventListener('click', markMessagesAsRead);
+            
+            // Mark messages as read when scrolling
+            chatMessages.addEventListener('scroll', markMessagesAsRead);
+        }
+        
+        // Show notification for new messages
+        function showNotification(messageText, senderName) {
+            if (!isChatFocused) {
+                unreadMessageCount++;
+                updateNotificationBadge();
+                
+                // Update notification toast content
+                notificationTitle.textContent = `New Message from ${senderName}`;
+                notificationMessage.textContent = messageText;
+                
+                // Show notification toast
+                notificationToast.classList.add('show');
+                
+                // Auto-hide notification after 5 seconds
+                if (notificationTimeout) {
+                    clearTimeout(notificationTimeout);
+                }
+                notificationTimeout = setTimeout(hideNotification, 5000);
+            }
+        }
+        
+        // Hide notification
+        function hideNotification() {
+            notificationToast.classList.remove('show');
+            if (notificationTimeout) {
+                clearTimeout(notificationTimeout);
+                notificationTimeout = null;
+            }
+        }
+        
+        // Update notification badge
+        function updateNotificationBadge() {
+            if (unreadMessageCount > 0) {
+                notificationBadge.textContent = unreadMessageCount;
+                notificationBadge.style.display = 'flex';
+                
+                // Update document title
+                document.title = `(${unreadMessageCount}) Smart Chat - Auto Room System`;
+            } else {
+                notificationBadge.style.display = 'none';
+                document.title = 'Smart Chat - Auto Room System';
+            }
+        }
+        
+        // Mark all messages as read
+        function markMessagesAsRead() {
+            if (unreadMessageCount > 0) {
+                unreadMessageCount = 0;
+                updateNotificationBadge();
+            }
         }
         
         // Check for saved connections on app start
@@ -662,6 +847,7 @@
             };
             
             addMessage(message);
+            showNotification(randomReply, currentPartner);
         }
         
         // Add message to chat
@@ -726,6 +912,11 @@
                     for (let i = 1; i < messages.length; i++) {
                         messages[i].remove();
                     }
+                    
+                    // Reset notification
+                    unreadMessageCount = 0;
+                    updateNotificationBadge();
+                    hideNotification();
                 }
             });
         }
