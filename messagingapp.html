@@ -519,6 +519,9 @@
             checkSavedConnections();
             updateStatus('Smart Chat Ready - Auto-reconnect enabled', 'info');
             setupNotificationListeners();
+            
+            // Test notification system
+            console.log("Notification system initialized");
         }
         
         // Setup notification event listeners
@@ -526,32 +529,50 @@
             // Close notification when close button is clicked
             notificationClose.addEventListener('click', hideNotification);
             
-            // Mark messages as read when chat is focused
+            // Mark messages as read when window is focused
             window.addEventListener('focus', () => {
+                console.log("Window focused - marking messages as read");
                 isChatFocused = true;
                 markMessagesAsRead();
             });
             
             window.addEventListener('blur', () => {
+                console.log("Window blurred");
                 isChatFocused = false;
             });
             
             // Mark messages as read when clicking on the chat area
-            chatMessages.addEventListener('click', markMessagesAsRead);
+            chatMessages.addEventListener('click', () => {
+                console.log("Chat area clicked - marking messages as read");
+                markMessagesAsRead();
+            });
             
             // Mark messages as read when scrolling
-            chatMessages.addEventListener('scroll', markMessagesAsRead);
+            chatMessages.addEventListener('scroll', () => {
+                console.log("Chat scrolled - marking messages as read");
+                markMessagesAsRead();
+            });
+            
+            // Also mark as read when user interacts with the chat input
+            messageInput.addEventListener('focus', markMessagesAsRead);
+            sendButton.addEventListener('click', markMessagesAsRead);
         }
         
         // Show notification for new messages
         function showNotification(messageText, senderName) {
-            if (!isChatFocused) {
+            console.log("Show notification called:", messageText, senderName);
+            console.log("isChatFocused:", isChatFocused);
+            
+            // Always show notification for testing
+            // In real app, you might want to check if chat is focused
+            // if (!isChatFocused) {
                 unreadMessageCount++;
                 updateNotificationBadge();
                 
                 // Update notification toast content
                 notificationTitle.textContent = `New Message from ${senderName}`;
-                notificationMessage.textContent = messageText;
+                notificationMessage.textContent = messageText.length > 50 ? 
+                    messageText.substring(0, 50) + "..." : messageText;
                 
                 // Show notification toast
                 notificationToast.classList.add('show');
@@ -561,6 +582,34 @@
                     clearTimeout(notificationTimeout);
                 }
                 notificationTimeout = setTimeout(hideNotification, 5000);
+                
+                // Play notification sound if available
+                playNotificationSound();
+            // }
+        }
+        
+        // Play notification sound
+        function playNotificationSound() {
+            // Create a simple notification sound using Web Audio API
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.01);
+                gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.3);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.3);
+            } catch (e) {
+                console.log("Audio context not supported");
             }
         }
         
@@ -575,8 +624,9 @@
         
         // Update notification badge
         function updateNotificationBadge() {
+            console.log("Updating badge, unread count:", unreadMessageCount);
             if (unreadMessageCount > 0) {
-                notificationBadge.textContent = unreadMessageCount;
+                notificationBadge.textContent = unreadMessageCount > 9 ? '9+' : unreadMessageCount;
                 notificationBadge.style.display = 'flex';
                 
                 // Update document title
@@ -589,9 +639,11 @@
         
         // Mark all messages as read
         function markMessagesAsRead() {
+            console.log("Marking messages as read");
             if (unreadMessageCount > 0) {
                 unreadMessageCount = 0;
                 updateNotificationBadge();
+                hideNotification();
             }
         }
         
@@ -932,6 +984,11 @@
         
         // Initialize the app
         initializeApp();
+        
+        // Test notification function - you can call this from browser console
+        window.testNotification = function() {
+            showNotification("This is a test notification message", "Test User");
+        };
     </script>
 </body>
 </html>
