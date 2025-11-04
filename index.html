@@ -286,59 +286,6 @@
             margin: 15px 0;
             border-left: 4px solid #28a745;
         }
-        
-        .notification-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            margin: 15px 0;
-        }
-        
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-        
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        
-        input:checked + .slider {
-            background-color: #6e8efb;
-        }
-        
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
 
         /* Mobile-only styles */
         @media (max-width: 768px) {
@@ -413,14 +360,6 @@
                 <h2>Real-time Message Status</h2>
                 <p style="margin-bottom: 20px; color: #666;">Select your user to test WhatsApp-style message status</p>
                 
-                <div class="notification-toggle">
-                    <span>Enable Notifications:</span>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="notificationToggle">
-                        <span class="slider"></span>
-                    </label>
-                </div>
-                
                 <div class="user-selection">
                     <div class="user-option" onclick="selectUser('person1')">
                         <img src="https://i.pravatar.cc/150?img=5" class="user-avatar">
@@ -477,16 +416,17 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     
     <script>
-        // === REPLACE THIS WITH YOUR FIREBASE CONFIG ===
+        // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY_HERE",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyBnPD7v-8IGqrYepC2RvJDJRS2gFFvl2f8",
+            authDomain: "student-database-e3f5c.firebaseapp.com",
+            databaseURL: "https://student-database-e3f5c.firebaseio.com",
+            projectId: "student-database-e3f5c",
+            storageBucket: "student-database-e3f5c.firebasestorage.app",
+            messagingSenderId: "502335602197",
+            appId: "1:502335602197:web:7eea29a2b2402d98e1d81c",
+            measurementId: "G-DD9RHLS83Z"
         };
-        // === END OF FIREBASE CONFIG ===
         
         // App State
         let currentUser = null;
@@ -496,7 +436,6 @@
         let firebaseInitialized = false;
         let db = null;
         let messageElements = new Map(); // Store message elements for real-time updates
-        let notificationsEnabled = false;
         
         // DOM Elements
         const loginScreen = document.getElementById('loginScreen');
@@ -509,7 +448,6 @@
         const globalStatusDot = document.getElementById('globalStatusDot');
         const globalStatusText = document.getElementById('globalStatusText');
         const currentTime = document.getElementById('currentTime');
-        const notificationToggle = document.getElementById('notificationToggle');
 
         // User data
         const users = {
@@ -541,71 +479,6 @@
             } else {
                 globalStatusDot.classList.remove('active');
                 globalStatusText.textContent = 'Offline';
-            }
-        }
-
-        // Request notification permission
-        function requestNotificationPermission() {
-            if (!("Notification" in window)) {
-                console.log("This browser does not support notifications");
-                return false;
-            }
-            
-            if (Notification.permission === "granted") {
-                console.log("Notification permission already granted");
-                notificationsEnabled = true;
-                return true;
-            } else if (Notification.permission !== "denied") {
-                Notification.requestPermission().then(permission => {
-                    if (permission === "granted") {
-                        console.log("Notification permission granted");
-                        notificationsEnabled = true;
-                        showNotification("Notifications Enabled", "You'll now receive notifications for new messages");
-                        return true;
-                    } else {
-                        console.log("Notification permission denied");
-                        notificationsEnabled = false;
-                        notificationToggle.checked = false;
-                        return false;
-                    }
-                });
-            } else {
-                console.log("Notification permission denied");
-                notificationsEnabled = false;
-                notificationToggle.checked = false;
-                return false;
-            }
-        }
-
-        // Show notification
-        function showNotification(title, body) {
-            if (!notificationsEnabled) return;
-            
-            // Check if the browser supports notifications
-            if (!("Notification" in window)) {
-                console.log("This browser does not support notifications");
-                return;
-            }
-
-            // Check if notification permissions have been granted
-            if (Notification.permission === "granted") {
-                // Create notification
-                const notification = new Notification(title, {
-                    body: body,
-                    icon: currentUser ? currentUser.avatar : 'https://i.pravatar.cc/150?img=5',
-                    badge: 'https://cdn-icons-png.flaticon.com/512/733/733585.png'
-                });
-
-                // Close notification after 5 seconds
-                setTimeout(() => {
-                    notification.close();
-                }, 5000);
-
-                // Handle notification click
-                notification.onclick = function() {
-                    window.focus();
-                    notification.close();
-                };
             }
         }
 
@@ -657,7 +530,6 @@
             } catch (error) {
                 console.error("Firebase initialization error: ", error);
                 firebaseInitialized = false;
-                alert("Firebase initialization failed. Please check your configuration.");
             }
         }
 
@@ -699,27 +571,12 @@
                                 // If message is from other user, mark as read immediately
                                 if (message.senderId !== currentUserId) {
                                     markMessageAsRead(message.id);
-                                    
-                                    // Show notification for new message from other user
-                                    if (notificationsEnabled && document.hidden) {
-                                        showNotification(
-                                            `${message.sender}`, 
-                                            message.text.length > 50 
-                                                ? `${message.text.substring(0, 50)}...` 
-                                                : message.text
-                                        );
-                                    }
                                 }
                             }
                         } 
                         else if (change.type === "modified") {
                             // Message updated - update status in real-time
                             updateMessageStatus(message.id, message);
-                            
-                            // Show notification when message is read (blue tick)
-                            if (message.read && message.senderId === currentUserId && notificationsEnabled) {
-                                showNotification("Message Read", `${otherUser.name} read your message`);
-                            }
                         }
                     });
                 });
@@ -875,15 +732,6 @@
         messageInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 sendMessage();
-            }
-        });
-
-        // Notification toggle
-        notificationToggle.addEventListener('change', function() {
-            if (this.checked) {
-                requestNotificationPermission();
-            } else {
-                notificationsEnabled = false;
             }
         });
 
